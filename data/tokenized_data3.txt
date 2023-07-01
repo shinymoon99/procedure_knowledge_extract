@@ -1,0 +1,417 @@
+步骤 1 ～ 5 会 建立 RRC 连接
+步骤 6 、 9 会 建立 S1 连接
+完成 这些 过程 即 标志 着 NASsignallingconnection 建立 完成
+见 24.301 。 
+消息 7 的 说明 ： UE 刚 开机 第一次 attach
+使用 的 IMSI
+无 Identity 过程 ； 后续
+如果 有 有效 的 GUTI
+使用 GUTIattach
+核心网 才 会 发起 Identity 过程 （ 为 上下行 直传 消息 ） 。 
+消息 10 ~ 12 的 说明 ： 如果 消息 9 带 了 UERadioCapabilityIE
+则 eNB 不会 发送 UECapabilityEnquiry 消息 给 UE
+即 没有 10 ~ 12 过程 ； 否则 会 发送
+UE 上报 无线 能力 信息 后
+eNB 再发 UECapabilityInfoIndication
+给 核心 网上 报 UE 的 无线 能力 信息 。 
+eNB 收到 msg3 以后
+DCM 给 USM 配置 SRB1
+配置 完后 发送 msg4 给 UE ； eNB 在 发送 RRCConnectionReconfiguration 前
+DCM 先给 USM 配置 DRB / SRB2 等 信息
+配置 完后 发送 RRCConnectionReconfiguration 给 UE
+收到 RRCConnectionReconfigurationComplete 后
+控制 面再 通知 用户 面 资源 可用 。 
+消息 13 ~ 15 的 说明 ： eNB 发送 完 消息 13
+并不需要 等 收到 消息 14
+就 直接 发送 消息 15 。 
+如果 发起 IMSIattach 时
+UE 的 IMSI 与 另外 一个 UE 的 IMSI 重复
+并且 其他 UE 已经 attach
+则 核心网 会 释放 先前 的 UE 。 如果 IMSI 中 的 MNC 与 核心网 配置 的 不 一致
+则 核心网 会 回复 attachreject 。 
+消息 9 的 说明 ： 该 消息 为 MME 向 eNB 发起 的 初始 上下文 建立 请求
+请求 eNB 建立 承载 资源
+同时 带 安全 上下文
+可能 带 用户 无线 能力 、 切换 限制 列表 等 参数 。 UE 的 安全 能力 参数 是 通过 attachrequest 消息 带给 核心网 的
+核心网 再 通过 该 消息 送给 eNB 。 UE 的 网络 能力 （ 安全 能力 ） 信息 改变 的话
+需要 发起 TAU 。 
+MSG1 ： UE 在 RACH 上 发送 随机 接入 前缀
+携带 preamble 码 ； 
+MSG2 ： eNB 侧 接收 到 MSG1 后
+在 DL - SCH 上 发送 在 MAC 层 产生 随机 接入 响应 （ RAR ）
+RAR 响应 中 携带 了 TA 调整 和 上行 授权 指令 以及 T - CRNTI （ 临时 CRNTI ） ； 
+MSG3 （ 连接 建立 请求 ） ： UE 收到 MSG2 后
+判断 是否 属于 自己 的 RAR 消息 （ 利用 preambleID 核对 ）
+并 发送 MSG3 消息
+携带 UE - ID 。 UE 的 RRC 层 产生 RRCConnectionRequest 并 映射 到 UL – SCH 上 的 CCCH 逻辑 信道 上 发送 ； 
+MSG4 ( RRC 连接 建立 ) ： RRCContentionResolution 由 eNB 的 RRC 层 产生
+并 在 映射 到 DL – SCH 上 的 CCCHorDCCH ( FFS ) 逻辑 信道 上 发送
+UE 正确 接收 MSG4 完成 竞争 解决 。 
+MSG0 ： eNB 通过 下行 专用 信令 给 UE 指派 非 冲突 的 随机 接入 前缀 （ non - contentionRandomAccessPreamble ）
+这个 前缀 不 在 BCH 上 广播 的 集合 中 。 
+MSG1 ： UE 在 RACH 上 发送 指派 的 随机 接入 前缀 。 
+MSG2 ： ENB 的 MAC 层 产生 随机 接入 响应
+并 在 DL - SCH 上 发送 。 对于 非 竞争 随机 接入 过程
+preamble 码由 ENB 分配
+到 RAR 正确 接受 后 就 结束 。 
+处在 RRC _ IDLE 态 的 UE 进行 ServiceRequest 过程
+发起 随机 接入 过程
+即 MSG1 消息 ； 
+eNB 检测 到 MSG1 消息 后
+向 UE 发送 随机 接入 响应 消息
+即 MSG2 消息 ； 
+UE 收到 随机 接入 响应 后
+根据 MSG2 的 TA 调整 上行 发送 时机
+向 eNB 发送 RRCConnectionRequest 消息
+即 MSG3 消息 ； 
+eNB 向 UE 发送 RRCConnectionSetup 消息
+包含 建立 SRB1 承载 信息 和 无线 资源配置 信息 ； 
+UE 完成 SRB1 承载 和 无线 资源配置 , 向 eNB 发送 RRCConnectionSetupComplete 消息
+包含 NAS 层 ServiceRequest 信息 ； 
+eNB 选择 MME
+向 MME 发送 INITIALUEMESSAGE 消息
+包含 NAS 层 ServiceRequest 消息 ； 
+UE 与 EPC 间 执行 鉴权 流程
+与 GSM 不同 的 是 ： 4G 鉴权 是 双向 鉴权 流程
+提高 网络安全 能力 。 
+MME 向 eNB 发送 INITIALCONTEXTSETUPREQUEST 消息
+请求 建立 UE 上下文 信息 ； 
+eNB 接收 到 INITIALCONTEXTSETUPREQUEST 消息
+如果 不 包含 UE 能力 信息
+则 eNB 向 UE 发送 UECapabilityEnquiry 消息
+查询 UE 能力 ； 
+UE 向 eNB 发送 UECapabilityInformation 消息
+报告 UE 能力 信息 ； 
+eNB 向 MME 发送 UECAPABILITYINFOINDICATION 消息
+更新 MME 的 UE 能力 信息 ； 
+eNB 根据 INITIALCONTEXTSETUPREQUEST 消息 中 UE 支持 的 安全 信息
+向 UE 发送 SecurityModeCommand 消息
+进行 安全 激活 ； 
+UE 向 eNB 发送 SecurityModeComplete 消息
+表示 安全 激活 完成 ； 
+eNB 根据 INITIALCONTEXTSETUPREQUEST 消息 中 的 ERAB 建立 信息
+向 UE 发送 RRCConnectionReconfiguration 消息 进行 UE 资源 重配
+包括 重配 SRB1 和 无线 资源配置
+建立 SRB2 信令 承载 、 DRB 业务 承载 等 ； 
+UE 向 eNB 发送 RRCConnectionReconfigurationComplete 消息
+表示 资源配置 完成 ； 
+eNB 向 MME 发送 INITIALCONTEXTSETUPRESPONSE 响应 消息
+表明 UE 上下文 建立 完成 。 流程 到 此时 完成 了 servicerequest
+随后 进行 数据 的 上传 与 下载 。 
+信令 17 ~ 20 是 数据传输 完毕 后
+对 UE 去 激活 过程
+涉及 UEcontextrelease 流程 。 
+当 EPC 需要 给 UE 发送数据 时
+则 向 eNB 发送 PAGING 消息 ； 
+eNB 根据 MME 发 的 寻呼 消息 中 的 TA 列表 信息
+在 属于 该 TA 列表 的 小区 发送 Paging 消息
+UE 在 自己 的 寻呼 时机 接收 到 eNB 发送 的 寻呼 消息 。 
+eNodeB 向 UE 下发 测量 控制
+通过 RRCConnectionReconfigration 消息 对 UE 的 测量 类型 进行 配置 ； 
+UE 按照 eNodeB 下发 的 测量 控制 在 UE 的 RRC 协议 端 进行 测量 配置
+并 向 eNodeB 发送 RRCConnectionReconfigrationComplete 消息 表示 测量 配置 完成 ； 
+UE 按照 测量 配置 向 eNodeB 上报 测量 报告 ； 
+eNodeB 根据 测量 报告 进行 判决
+判决 该 UE 将 发生 eNodeB 内 切换
+在 新 小 区内 进行 资源 准入
+资源 准入 成功 后 为 该 UE 申请 新 的 空口 资源 ； 
+资源 申请 成功 后 eNodeB 向 UE 发送 RRCConnectionReconfigration 消息
+指示 UE 发起 切换 动作 ； 
+UE 接入 新 小区 后 eNodeB 发送 RRCConnectionReconfigrationComplete 消息 指示 UE 已经 接入 新 小区 ； 
+eNodeB 收到 重 配置 完成 消息 后
+释放 该 UE 在 源 小区 占用 的 资源 。 
+源 eNodeB 向 UE 下发 测量 控制
+通过 RRCConnectionReconfigration 消息 对 UE 的 测量 类型 进行 配置 ； 
+UE 按照 eNodeB 下发 的 测量 控制 在 UE 的 RRC 协议 端 进行 测量 配置
+并 向 eNodeB 发送 RRCConnectionReconfigrationComplete 消息 表示 测量 配置 完成 ； 
+UE 按照 测量 配置 向 eNodeB 上报 测量 报告 ； 
+源 eNodeB 根据 测量 报告 进行 判决
+判决 该 UE 发生 eNodeB 间 切换
+也 有 可能 负荷分担 的 原因 触发 切换 ； 
+源 eNodeB 向 目标 eNodeB 发生 HANDOVERREQUEST 消息
+指示 目标 eNodeB 进行 切换 准备
+切换 请求 消息 包含 源 eNB 分配 的 OldeNBUEX2APID
+MME 分配 的 MMEUES1APID
+需要 建立 的 EPS 承载 列表 以及 每个 EPS 承载 对应 的 核心网 侧 的 数据 传送 的 地址 。 目标 ENB 收到 HANDOVERREQUEST 后 开始 对要 切换 入 的 ERABs 进行 接纳 处理 。 ； 
+目标 小区 进行 资源 准入
+为 UE 的 接入 分配 空口 资源 和 业务 的 SAE 承载 资源 ； 
+目标 小区 资源 准入 成功 后
+向源 eNodeB 发送 “ 切换 请求 确认 ” 消息
+指示 切换 准备 工作 完成
+“ 切换 请求 确认 ” 消息 包含 NeweNBUEX2APID 、 OldeNBUEX2APID 、 新建 EPS 承载 对应 在 D 侧 上下行 数据 传送 的 地址 、 目标 侧 分配 的 专用 接入 签名 等 参数 ； 
+源 eNodeB 将 分配 的 专用 接入 签名 配置 给 UE
+向 UE 发送 RRCConnectionReconfigration 消息 命令 UE 执行 切换 动作 ； 
+UE 向 目标 eNodeB 发送 RRCConnectionReconfigrationComplete 消息 指示 UE 已经 接入 新 小区
+表示 UE 已经 切换 到 了 目标 侧 。 同时
+切换 期间 的 业务 数据 转发 开始 进行 ； 
+目标 eNodeB 向 MME 发送 PATHSWITCHREQUEST 消息 请求
+请求 MME 更新 业务 数据通道 的 节点 地址
+通知 MME 切换 业务 数据 的 接续 路径
+从源 eNB 到 目标 eNB
+消息 中 包含 原侧 侧 的 MMEUES1APID 、 目标 侧侧 分配 的 eNBUES1AP 、 EPS 承载 在 目标 侧 将 使用 的 下行 地址 ； 
+MME 成功 更新 数据通道 节点 地址
+向 目标 eNodeB 发送 PATHSWITCHREQUESTACKNOWLEDGE 消息
+表示 可以 在 新 的 SAEbearers 上 进行 业务 通信 ； 
+UE 已经 接入 新 的 小区
+并且 在 新 的 小区 能够 进行 业务 通信
+需要 释放 在 源 小区 所 占用 的 资源
+目标 eNodeB 向源 eNodeB 发送 UECONTEXTRELEASE 消息 ； 
+源 eNodeB 释放 该 UE 的 上下文
+包括 空口 资源 和 SAEbearers 资源 。 
+源 eNodeB 和 目标 eNodeB 之间 不 存在 X2 接口 ； 
+源 eNodeB 尝试 通过 X2 接口 切换
+但 被 目标 eNodeB 拒绝 。 
+图中 1 ~ 4 步骤 与 X2 切换 相同
+不 做 累述 ； 
+源 eNB 通过 S1 接口 的 HANDOVERREQUIRED 消息 发起 切换 请求
+消息 中 包含 MMEUES1APID 、 源侧 分配 的 eNBUES1APID 等 信息 。 
+MME 向 目标 eNB 发送 HANDOVERREQUEST 消息
+消息 中 包括 MME 分配 的 MMEUES1APID 、 需要 建立 的 EPS 列表 以及 每个 EPS 承载 对应 的 核心网 侧 数据 传送 的 地址 等 参数 。 
+目标 eNB 分配 后 目标 侧 的 资源 后
+进行 切换 入 的 承载 接纳 处理
+如果 资源 满足
+小区 接入 允许 就 给 MME 发送 HANDOVERREQUESTACKNOWLEDGE 消息
+包含 目标 侧侧 分配 的 eNBUES1APID
+接纳 成功 的 EPS 承载 对应 的 eNodeB 侧 数据 传送 的 地址 等 参数 。 
+源 eNB 收到 HANDOVERCOMMAND
+获知 接纳 成功 的 承载 信息 以及 切换 期间 业务 数据 转发 的 目标 侧 地址 。 
+源 eNB 通过 eNBStatusTransfer 消息
+MM E通 过 MMEStatusTransfer 消息
+将 PDCP 序号 通过 MME 从源 eNB 传递 到 目标 eNB 。 目标 eNB 收到 UE 发送 的 RRCConnectionReconfigurationComplete 消息
+表明 切换 成功 。 
+目标 eNodeB 向 MME 发送 PATHSWITCHREQUEST 消息 请求
+请求 MME 更新 业务 数据通道 的 节点 地址
+通知 MME 切换 业务 数据 的 接续 路径
+从源 eNB 到 目标 eNB
+消息 中 包含 原侧 侧 的 MMEUES1APID 、 目标 侧侧 分配 的 eNBUES1AP 、 EPS 承载 在 目标 侧 将 使用 的 下行 地址 ； 
+MME 成功 更新 数据通道 节点 地址
+向 目标 eNodeB 发送 PATHSWITCHREQUESTACKNOWLEDGE 消息
+表示 可以 在 新 的 SAEbearers 上 进行 业务 通信 ； 
+目标 侧 eNB 发送 HANDOVERNOTIFY 消息
+通知 MME 目标 侧 UE 已经 成功 接入 。 
+源 ENB 收到 “ UECONTEXTRELEASECOMMAND ” 消息 后
+开始 进入 释放 资源 的 流程 。 
+系统 间 切换 是 源 接入 系统 网络 控制 的 。 源 接入 系统 决定 启动 切换 准备 并 按 目标 系统 要求 的 格式 提供 必要 的 信息 。 也就是说
+源 系统 去 适配 目标 系统 。 真正 的 切换 执行 过程 由源 系统控制 。 
+系统 间 切换 是 一种 后 向 切换
+也就是说
+目标 3GPP 接入 系统 中 的 无线 资源 在 UE 收到 从源 系统 切换 到 目标 系统 的 切换 命令 前 已经 准备就绪 。 
+为 实现 后 向 切换
+当 接入网 （ RAN ） 级 接口 不可 用时
+将 使用 核心网 （ CN ） 级 控制 接口 。 
+UE 发起 CSFallback 语音 业务 请求 。 UE 语音 拨打 时
+会发 一条 extendedservicerequest
+消息 里会 携带 CSFB 信息 。 其中 service - type 信元 指示 业务 类型 为 始发 CSFB 语音 业务
+同时 携带 该 UE 在 联合 附着 过程 中 CS 域 给 它 分配 的 TMSI 。 之后 会 在 基站 的 辅助 下 回落 至 2G 。 
+MME 发送 InitialContextSetupRequest 消息 给 eNodeB
+包含 CSFallbackIndicator 。 该 消息 指示 eNodeB
+UE 因 CSFallback 业务 需要 回落 到 UTRAN / GERAN 。 
+eNodeB 要求 UE 开始 系统 的 小区 测量
+并 获得 UE 上报 的 测量 报告
+确定 重定向 的 目标 系统 小区 。 然后 向 UE 发送 目标 系统 具体 的 无线 配置 信息
+并 释放 连接 。 
+UE 接入 目标 系统 小区
+发起 CS 域 的 业务 请求 CMServiceRequest 。 如果 CM 业务 请求 消息 中 携带 “ CSMO ” 标志
+则 MSCServer 记录本 次呼叫 是 移动 始端 CSFB 呼叫 。 
+如果 目标 系统 小区 归属 的 MSCServer 与 UE 附着 EPS 网络 时 登记 的 MSCServer 不同
+则 该 MSCServer 收到 UE 的 业务 请求 时
+由于 没有 该 UE 的 信息
+可以 采取 隐式 位置 更新 流程
+接受 用户 请求 。 如果 MSCServer 不 支持 隐式 位置 更新
+且 MSCServer 没有 用户 数据
+则 拒绝 该 用户 的 业务 请求 。 如果 MSCServer 拒绝 用户 的 业务 请求 会 导致 UE 发起 一个 CS 域 位置 更新 流程 。 终端 发起 位置 更新 请求
+且 位置 更新 请求 消息 中 的 Additionalupdateparameters 信元 中 携带 CSMO 标识
+同时 该 标识 有效
+则 MSCServer 会 记录本 次呼叫 是 CSFB 呼叫 。 （ CSfallback 紧急 呼叫 流程 中
+CM _ SERVICE _ REQUEST 消息 前 无需 位置 更新 。 
+完成 位置 更新 后 UE 再次 在 CS 域 建立 语音 呼叫 流程 。 
+通话 结束 后
+MSCServer 向 主叫 回落 到 的 BSC 发送 的 拆线 消息 CLEAR _ COMMAND 消息 中 携带 CSFBIndication 信元
+指示 BSC 拆除 空口 连接 并 指示 UE 回到 LTE 网络 。 或者 MSCServer 向 主叫 回落 到 的 RNC 发送 IU _ RELEASE _ COMMAND 消息
+携带 EndOfCSFB 信元
+指示 RNC 拆除 空口 连接 并 指示 UE 回到 LTE 网络 。 
+MSC 收到 BSC 的 CLEAR _ COMPLETE 消息 / RNC 的 IU _ RELEASE _ COMPLETE 消息 表示 呼叫 结束
+A 口 拆链 完成 。 接入 侧 在 指示 终端 重选 网络 时 只 针对 CSFB 用户 通话 前 携带 LTE 频点
+实现 CSFB 终端 快速 返回 LTE
+快速 回落 过程 也 称为 FastReturn （ 用户 不可 及 时间 可 缩短 为 1 - 2 秒 。 ） 。 
+GMSCServer 向 被叫 用户 归属 HLR 发送 取 路由 信息 请求 。 
+HLR 收到 该 SRI 消息 后
+向 被叫 用户 当前 附着 到 的 oldMSCServer 获取 漫游 号码 。 
+oldMSCServer 为 该 次呼叫 分配 漫游 号码 MSRN1
+并 返回 给 HLR 。 
+HLR 将 该 漫游 号码 发送给 GMSC 。 
+GMSC 收到 该 漫游 号码 后
+进行 号码 分析
+根据 分析 结果 将 呼叫 路由 到 oldMSCServer 。 
+MSCServer 收到 IAM 入局 （ 例如 中继 ISUP 入局 ） 消息 后
+根据 存在 的 SGs 关联 和 MME 信息
+发送 SGsAP - PAGING - REQUEST ( 携带 IMSI
+TMSI
+Serviceindicator
+CLI
+LAC ) 消息 给 MME 。 
+MME 发送 Paging 消息 给 eNodeB 。 eNodeB 发起 空口 的 Paging 流程 。 
+UE 建立 连接 并 发送 ExtendedServiceRequest 消息 给 MME （ 消息 中 携带 “ CSMT ” 移动 终端 标识 ） 。 
+MME 发送 SGsAP - SERVICE - REQUEST 消息 给 MSCServer 。 MSCServer 收到 此 消息
+不再 向 MME 重发 寻呼 请求 消息 。 为 避免 呼叫 接续 过程 中
+主叫 等待时间 过长
+MSCServer 收到 包含 空闲 态 指示 的 SGsServiceRequest 消息
+先 通知 主叫
+呼叫 正在 接续 过程 中 。 
+MME 发送 InitialUEContextSetup 消息 给 eNodeB
+包含 CSFallbackIndicator 。 该 消息 指示 eNodeB
+UE 因 CSFB 业务 需要 回落 到 UTRAN / GERAN 。 
+UE 回落 到 CS 域 之后
+UE 检测 到 当前 的 位置 区 信息 和 存储 的 位置 区 不同
+将 发起 位置 更新 。 MSCServer 收到 UE 发送 的 LOCATION _ UPDATE _ REQUEST 消息 。 这种 情况 下
+UE 不 需要 回 PagingResponse 给 MSCServer
+UE 直接 发送 SETUP 消息 建立 呼叫 。 如果 位置 更新 消息 中 携带 “ CSMT ” 标志
+则 MSCServer 记录本 次呼叫 是 CSFB 呼叫 。 
+伴随 着 空口 、 A / Iu - CS 接口 连接 的 建立
+UE 回 PagingResponse 消息 给 MSCServer
+该 消息 中 携带 CSMT 标识
+即使 BSC / RNC 没有 向 该 UE 发起 过 寻呼 请求
+也 需要 能 处理 UE 的 寻呼 响应 。 如果 寻呼 响应 消息 中 的 位置 区 信息 和 VLR 中 保存 的 不 一致
+则 VLR 在 业务 接入 成功 之后 将 SGs 关联 置 为 非 关联 。 
+建立 CS 呼叫 。 
+通话 结束 后
+指示 BSC / RNC 拆除 空口 连接 并 指示 UE 回到 LTE 网络 。 
+MSC 收到 BSC 的 CLEAR _ COMPLETE 消息 / RNC 的 IU _ RELEASE _ COMPLETE 消息 表示 呼叫 结束 。 接入 侧 在 指示 终端 重选 网络 时 只 针对 CSFB 用户 携带 LTE 频点
+实现 CSFB 终端 快速 返回 E - UTRAN 。 FastReturn 方案 也 需要 网络 的 支持
+如果 网络 不 支持
+则 通过 网络 优先级 的 方式 返回 LTE （ 一般 为 最高 优先级 ） 。 
+UE 发起 CSFallback 呼叫 业务 请求 。 ExtendedServiceRequest 消息 中 的 service - type 信元 指示 业务 类型 为 紧急 呼叫 业务 。 
+MME 指示 eNodeB 需要 将 UE 回落 到 CS 域 。 
+CS 域 回落 完成 后
+UE 向 2G / 3GMSC 发起 CMServiceRequest 消息 。 
+MSC 向 UE 返回 CMServiceAccept 消息 。 
+UE 向 2G / 3GMSC 发送 EmergencySetup 消息 发起 紧急 呼叫 。 
+处在 RRC _ IDLE 态 的 UE 监听 广播 中 的 TAI 不 在 保存 的 TAUList 时
+发起 随机 接入 过程
+即 MSG1 消息 ； 
+eNB 检测 到 MSG1 消息 后
+向 UE 发送 随机 接入 响应 消息
+即 MSG2 消息 ； 
+UE 收到 随机 接入 响应 后
+根据 MSG2 的 TA 调整 上行 发送 时机
+向 eNB 发送 RRCConnectionRequest 消息 ； 
+eNB 向 UE 发送 RRCConnectionSetup 消息
+包含 建立 SRB1 承载 信息 和 无线 资源配置 信息 ； 
+UE 完成 SRB1 承载 和 无线 资源配置
+向 eNB 发送 RRCConnectionSetupComplete 消息
+包含 NAS 层 TAUrequest 信息 ； 
+eNB 选择 MME
+向 MME 发送 INITIALUEMESSAGE 消息
+包含 NAS 层 TAUrequest 消息 ； 
+MME 向 eNB 发送 DownlinkNASTransport 消息
+包含 NAS 层 TAUAccept 消息 ； 
+eNB 接收 到 DownlinkNASTransport 消息
+向 UE 发送 DLinformationtransfer 消息
+包含 NAS 层 TAUAccept 消息 ； 
+在 TAU 过程 中
+如果 分配 了 GUTI
+UE 才 会 向 eNB 发送 ULInformationTransfer
+包含 NAS 层 TAUComplete 消息 ； 
+eNB 向 MME 发送 UplinkNASTransport 消息
+包含 NAS 层 TAUComplete 消息 ； 
+TAU 过程 完成 释放 链路
+MME 向 Enb 发送 UECONTEXTRELEASECOMMAND 消息 指示 eNB 释放 UE 上下文 ； 
+eNB 向 UE 发送 RRCConnectionRelease 消息
+指示 UE 释放 RRC 链路 ； 并 向 MME 发送 UECONTEXTRELEASECOMPLETE 消息 进行 响应 。 
+同 IDLE 下 发起 的 不 设置 " active " 标识 的 正常 TAU 流程 相同 ； 
+UE 向 EPC 发送 上行 数据 ； 
+EPC 进行 下行 承载 数据 发送 地址 更新 。 
+EPC 向 UE 发送 下行 数据 。 
+处在 RRC _ CONNECTED 态 的 UE 进行 Detach 过程
+向 eNB 发送 ULInformationTransfer 消息
+包含 NAS 层 Taurequest 信息 ； 
+eNB 向 MME 发送 上行 直传 UPLINKNASTRANSPORT 消息
+包含 NAS 层 Taurequest 信息 ； 
+MME 向 基站 发送 下行 直传 DOWNLINKNASTRANSPORT 消息
+包含 NAS 层 Tauaccept 消息 ； 
+eNB 向 UE 发送 DLInformationTransfer 消息
+包含 NAS 层 Tauaccept 消息 ； 
+UE 向 eNB 发送 ULInformationTransfer 消息
+包含 NAS 层 Taucomplete 信息 ； 
+eNB 向 MME 发送 上行 直传 UPLINKNASTRANSPORT 消息
+包含 NAS 层 Taucomplete 信息 。 
+连接 状态 下 的 U E通 过 ULinformationTransfer 消息 将 BearerresourceallocationRequest 消息传递 给 eNB 。 
+eNB 通过 UPLINKNASTRANSPORT 消息 将 BearerresourceallocationRequest （ 或者 是 Bearerresourcemodificationrequest ） 发送给 EPC 。 
+EPC 通过 进行 承载 资源 申请 处理 。 
+EPC 通过 E - RABSETUPREQUEST 传递 ActivatededicatedEPSbearercontextrequest 消息 告知 eNB 。 
+eNB 通过 重配 消息
+将 NAS 消息 ActivatededicatedEPSbearercontextrequest 传递 给 UE 。 
+UE 建立 专用 承载 成功
+返回 RRCConnectionReconfigurationComplete 消息
+表明 承载 建立 成功 。 
+eNB 发送 E - RABSETUPRESPONSE 消息 给 EPC
+表明 无线 承载 建立 成功 。 
+UE 在 发送 完成 重配 完成 后
+通过 ULinformationTransfer 消息 将 ActivatededicatedEPSbearercontextaccept 消息 告知 eNB 。 
+eNB 发送 ULNASTRANSPORT 消息 ActivatededicatedEPSbearercontextaccept 告知 EPC 。 
+此时
+上下行 数据 已经 可以 进行 发送 。 
+EPC 通过 进行 承载 资源 申请 响应 。 
+连接 状态 下 的 U E通 过 ULinformationTransfer 消息 将 BearerresourceallocationRequest 消息传递 给 eNB 。 
+eNB 通过 UPLINKNASTRANSPORT 消息 将 BearerresourceallocationRequest （ 或者 是 Bearerresourcemodificationrequest ） 发送给 EPC 。 
+EPC 通过 进行 承载 资源 申请 处理 。 
+EPC 通过 E - RABMODIFYRESPONSE 传递 ModifydedicatedEPSbearercontextrequest 消息 告知 eNB 。 
+eNB 通过 重配 消息
+将 NAS 消息 ModifydedicatedEPSbearercontextrequest 传递 给 UE 。 
+UE 建立 专用 承载 成功
+返回 RRCConnectionReconfigurationComplete 消息
+表明 承载 修改 成功 。 
+eNB 发送 E - RABMODIFYRESPONSE 消息 给 EPC
+表明 无线 承载 修改 成功 。 
+UE 在 发送 完成 重配 完成 后
+通过 ULinformationTransfer 消息 将 ModifydedicatedEPSbearercontextaccept 消息 告知 eNB 。 
+eNB 发送 ULNASTRANSPORT 消息 ModifydedicatedEPSbearercontextaccept 告知 EPC 。 
+此时
+上下行 数据 已经 可以 进行 发送 。 
+EPC 通过 进行 承载 资源 申请 响应 。 
+EPC 发起 承载 释放 过程 。 这个 过程 可能 是 UE 申请 的
+也 可能 是 EPC 侧 启动 的 。 
+EPC 发送 E - RABReleaseCommand 消息 给 eNB
+其中 包含 NAS 消息 （ DeactivateEPSBearerContextRequest ） 。 
+eNB 收到 E - RABReleaseCommand 消息 后
+启动 承载 释放 流程
+并且 发送 RRCConnectionReconfiguration 给 UE
+其中 包含 NAS 消息 （ DeactivateEPSBearerContextRequest ） 消息 给 UE 。 
+UE 收到 重配 消息 RRCConnectionReconfiguration 中 的 NAS 消息 （ DeactivateEPSBearerContextRequest ） 后 释放 相关 承载 资源 。 
+UE 发送 返回 RRCConnectionReconfigurationComplete 消息
+表明 无线 承载 释放 成功 。 
+eNB 收到 RRCConnectionReconfigurationComplete 消息 后
+返回 E - RABReleaseResponse 消息 给 EPC 。 
+eNB 发送 E - RABMODIFYRESPONSE 消息 给 EPC
+表明 无线 承载 建立 成功 。 
+UE 在 发送 完成 重配 完成 后
+通过 ULinformationTransfer 消息 将 NAS 层 DeactivateEPSbearercontextaccept 消息 告知 eNB 。 
+eNB 发送 ULNASTRANSPORT 消息 DeactivateEPSbearercontextaccept 告知 EPC
+告知 EPC 进行 EPS 承载 删除 完成 。 
+用户 关机
+发起 去 附着 流程
+若 在 IDLE 状态 下有 RRC 连接 建立 的 过程
+UE 向 EPC 发送 消息 中 携带 NAS 消息 （ 类型 为 关机 ） 。 
+UE 侧 清空 所有 的 EPS 承载 和 RB 承载
+EPC 侧 清空 所有 的 EPS 承载 和 TEID 资源 , EPC 通知 ENB 释放 UE 文本 信息 。 
+ENB 释放 UE 文本 信息 并 通知 EPC 。 
+（ UE 的 EPS 能力 被 禁用 ） RRC 连接 建立 过程
+建立 完成 消息 中 附带 去 附着 请求 。 
+UE 和 EPC 相互 安全 验证 后
+执行 清除 EPS 承载 和 RB 资源
+EPC 向 UE 发送 去 附着 接受 消息 。 
+网络 向 终端 发起 UE 文本 释放 和 连接 释放 信息 。 
+（ UE 的 EPS 能力 被 禁用 ） UE 在 上行 传输 块 中 携带 去 附着 请求 消息
+执行 清除 EPS 承载 和 RB 资源
+EPC 向 UE 发送 去 附着 接受 消息 。 
+网络 向 终端 发起 UE 文本 释放 和 连接 释放 信息 。 
+如果 是 ESM 过程 导致 的 拒绝 （ 比如 默认 承载 建立 失败 ）
+才 会 带 PDNCONNECTIVITYREJECT 消息
+EMM 层 拒绝
+只有 ATTACHREJECT 消息 。 
+常见 的 拒绝 原因 有 ： IMSI 中 的 MNC 与 核心网 配置 的 不 一致 。 
+
+中兴 设备 的 定义 为 dL - Bandwidth = 5 （ n
+可谓 是 形式 不同
+内容 一致 。 大家 不必 细究
+明白 一种 方式 就行 。

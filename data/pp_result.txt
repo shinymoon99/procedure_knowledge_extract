@@ -1,0 +1,5 @@
+按照顺序的index表示
+<NF,向,NRF>
+<NF,发送,Nnrf_NFManagement_NFRegister_Request 消息>
+<NF,请求，注册>
+

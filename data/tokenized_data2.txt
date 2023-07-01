@@ -1,0 +1,248 @@
+UE -- > NW ： UE 发起 竞争性 随机 接入 
+UE < -- NW ： gNB 回复 MSG2 （ RAR ） 
+UE -- > NW ： UE 向 gNB 发送 RRCSetupRequest 消息
+携带 UE 的 InitialUE - Identity 和 EstablishmentCause
+请求 建立 RRC 连接
+该 消息 对应 于 随机 接入 过程 的 Msg3 
+UE < -- NW ： gNB 为 UE 分配 并 建立 SRB1 承载
+并 向 UE 发送 RRCSetup 消息 
+UE -- > NW ： UE 向 gNB 发送 RRCSetupComplete 消息
+RRC 连接 建立 成功 
+RRC 建立 成功 后
+UE 向 gNodeB 发送 RRCSetupComplete
+携带 selectedPLMN - Identity 、 registeredAMF 、 s - nssai - list 和 NAS 消息 
+gNodeB 为 UE 分配 专用 的 RAN - UE - NGAP - ID
+根据 selectedPLMN - Identity 、 registeredAMF 、 s - nssai - list 选择 AMF 节点
+然后 将 RRCSetupComplete 消息 中 携带 的 NAS 消息 通过 InitialUeMessage 发送给 AMF 
+gNodeB 透传 UE 和 AMF 之间 的 NAS 直传 消息
+完成 IDENTITY 查询 、 鉴权 、 NAS 安全 模式 和 注册 过程 。 详见 本文 " 7NAS 流程 " 章节 
+AMF 向 gNodeB 发送 InitialContextSetupReq 消息
+启动 初始 上下文 建立 过程 
+gNodeB 向 UE 发送 SecurityModeCommand 消息
+通知 UE 启动 完整性 保护 和 加密 过程 
+UE 根据 SecurityModeCommand 消息 指示 的 完整性 保护 和 加密算法
+派 生出 密钥
+然后 向 gNodeB 回复 SecurityModeComplete 消息 。 此后
+启动 上行 加密 
+gNodeB 向 UE 发送 UECapabilityEnquiry 消息
+发起 UE 能力 查询 过程 
+UE 向 gNodeB 回复 UECapabilityInformation 消息
+携带 UE 能力 信息 
+gNodeB 向 AMF 发送 UECapabilityInfolnd 消息
+透传 UE 能力 
+gNodeB 向 UE 下发 RRCReconfiguration 消息
+指示 建立 SRB2 和 DRB （ DataRadioBearer ） 
+UE 收到 RRCReconfiguration 消息 后
+开始 建立 SRB2 和 DRB 无线 承载 。 建立 成功 后 向 gNodeB 回复 RRCReconfigurationComplete 消息 
+gNodeB 向 AMF 回复 InitialContextSetupRsp 消息 
+gNB 为 本端 建立 的 RB 承载 PDCP 协议 实体 配置 相应 的 加密 参数 和 完整性 参数 及 密钥 
+gNB 开始 使能 RRC 完整性 保护 算法 
+gNB 向 UE 发送 SecurityModeCommand 消息
+该 消息 立即 启动 完整性 保护
+消息 中 包含 加密算法 和 完整性 保护 算法 选择 
+UE 收到 SecurityModeCommand 消息 后
+根据 消息 中 的 算法 选择 派生 密钥
+校验 消息 中 的 MAC - I
+然后 返回 SecurityModeComplete 消息 （ 含 MAC - I ） 给 gNB 
+gNB 向 UE 发送 UECapabilityEnquiry 消息
+发起 UE 能力 查询 过程 
+UE 向 gNodeB 回复 UECapabilityInformation 消息
+携带 UE 能力 信息 
+gNodeB 向 AMF 发送 UECapabilityInfolnd 消息
+透传 UE 能力 
+AMF 向 gNB 发送 UEContextModificationRequest 消息
+触发 UE 上下文 修改 过程 
+gNB 根据 SecurityKeyIE 信元 派 生出 KgNB *
+根据 KgNB * 进一步 派 生出 KRRC - enc , KRRC - int , KUP - enc 和 KUP - int
+向 UE 发送 RRCReconfiguration 消息
+通知 更新 密钥 
+UE 完成 密钥 更新 后
+向 gNB 回复 RRCReconfigurationComplte 消息 
+gNB 向 AMF 回复 UEContextModificationResponse 消息
+UE 上下文 修改 完成 
+【 可 选 】 如果 是 gNB 原因 导致 需要 发起 UE 释放 时
+gNB 向 AMF 发送 UEContextReleaseRequest 消息
+触发 UE 上下文 释放 过程 
+AMF 向 gNB 发送 UEContextReleaseCommand 消息
+命令 gNB 释放 UE 上下文 
+gNB 向 UE 发送 RRCRelease 消息
+通知 释放 RRC 连接 
+gNB 向 AMF 回复 UEContextReleaseComplete 消息
+同时 释放 本地 资源 
+AMF 向 gNB 发送 PDUSESSIONRESOURCESETUPREQUEST 消息
+携带 需要 建立 的 PDU 会话 列表 、 每个 PDU 会话 的 QosFlow 列表 、 以及 每个 QosFlow 的 质量 属性 等 
+gNB 根据 QosFlow 的 质量 属性 和 MML 界面 配置 的 策略
+将 QosFlow 映射 到 DRB
+向 UE 发送 RRCReconfiguration 消息
+发起 建立 DRB 承载 
+UE 完成 DRB 承载 建立 后
+向 gNB 回复 RRCReconfigurationComplte 消息 
+gNB 向 AMF 发送 PDUSESSIONRESOURCESETUPRESPONSE 消息
+将 成功 建立 的 PDUSession 信息 写入 PDUSessionResourceSetupResponseList 信元 中 
+AMF 向 gNB 发送 PDUSESSIONRESOURCEMODIFYREQUEST 消息
+携带 需要 增删 的 QoSFlowAddorModifyRequestList 和 QoSFlowtoReleaseList 
+gNB 向 UE 发送 RRCReconfiguration 消息 
+UE 向 gNB 回复 RRCReconfigurationComplte 消息 
+gNB 向 AMF 发送 PDUSESSIONRESOURCEMODIFYRESPONSE 消息
+将 修改 的 信息 写入 PDUSessionResourceModifyResponseList 信元 中 
+【 可 选 】 gNB 检测 到 NG - U 传输 故障 后
+先 尝试 重新分配 新 的 NG - U 地址
+如果 分配 失败
+则 向 核心网 发送 PDUSESSIONRESOURCENOTIFY
+触发 核心网 发起 PDU 会话 释放 过程 
+AMF 向 gNB 发送 的 PDUSESSIONRESOURCERELEASECOMMAND 消息
+携带 需要 删除 的 PDUSESSION 列表 
+gNB 向 UE 发送 RRCReconfiguration 消息
+通知 释放 PDU 会话 
+UE 完成 PDU 会话 释放 后
+向 gNB 回复 RRCReconfigurationComplte 消息 
+gNB 发起 该 PDUSESSION 对应 的 DRB 承载 和 NG - U 传输 的 删除 操作
+然后 向 AMF 发送 PDUSESSIONRESOURCERELEASERESPONSE 响应 消息 
+UE 上报 邻区 测量 报告 
+gNodeB 根据 测量 报告 携带 的 PCI
+判决 切换 的 目标 小区 与 服务 小区 同属 一个 gNodeb 并 启动 站 内 切换 流程
+目标 小区 根据 UE 源 小区 的 上下文 做 准入 判决 
+gNodeB - CU 侧 发送 UECONTEXTSETUPREQUEST 消息 给 gNodeB - DU
+向 gNodeB - DU 侧为 目标 小区 新 申请 用户 资源 
+如果 gNodeB - DU 资源分配 成功
+回复 UECONTEXTSETUPRESPONSE 消息 给 gNodeB - CU 
+gNodeB - CU 发送 UECONTEXTMODIFICATIONREQUEST 消息 给 gNodeB - DU
+通知 gNodeB - DU 下发 L2 停止 调度 指示 
+gNodeB - DU 回复 UECONTEXTMODIFICATIONRESPONSE 消息 给 gNodeB - CU 
+gNodeB 给 UE 发送 RRCReconfiguration 消息 携带 切换 的 目标 频点 、 PCI 以及 给 UE 配置 的 CRNTI 和 专用 preamble 
+UE 在 目标 小区 发起 非 竞争 的 随机 接入 MSG1
+携带 专用 preamble 
+gNodeB - DU 侧 回复 MSG2RAR 消息 
+UE 给 gNodeB 回复 RRCReconfigurationComplete
+UE 接入 到 目标 小区 
+UE 成功 接入 后 释放 源 小区 的 上下文 信息 
+UE 上报 邻区 测量 报告 
+gNodeB 根据 测量 报告 携带 的 PCI
+判决 切换 的 目标 小区 与 服务 小区 同属 一个 gNodeB 不同 DU 并 启动 同站 跨 DU 内 切换 流程
+目标 小区 根据 UE 源 小区 的 上下文 做 准入 判决 
+gNodeB - CU 侧 发送 UECONTEXTSETUPREQUEST 消息 给 目标 gNodeB - DU
+向 目标 gNodeB - DU 侧为 目标 小区 新 申请 用户 资源 
+如果 目标 gNodeB - DU 资源分配 成功
+回复 UECONTEXTSETUPRESPONSE 消息 给 gNodeB - CU 
+gNodeB - CU 发送 UECONTEXTMODIFICATIONREQUEST 消息 给源 gNodeB - DU
+通知 gNodeB - DU 下发 L2 停止 调度 指示 
+源 gNodeB - DU 回复 UECONTEXTMODIFICATIONRESPONSE 消息 给 gNodeB - CU 
+准入 成功 后
+gNodeB 给 UE 发送 RRCReconfiguration 消息 携带 切换 的 目标 频点 、 PCI 以及 给 UE 配置 的 CRNTI 和 专用 preamble 
+UE 在 目标 小区 发起 非 竞争 的 随机 接入 MSG1
+携带 专用 preamble 
+目标 gNodeB - DU 侧 回复 MSG2RAR 消息 
+UE 给 gNodeB 回复 RRCReconfigurationComplete
+UE 接入 到 目标 小区 
+UE 成功 接入 后 释放 源 小区 的 上下文 信息 
+gNodeB 通过 RRCReconfiguration 向 UE 下发 测量 控制
+包含 测量 对象 （ 同频 / 异频 ）
+测量 报告 配置
+GAP 测量 配置 等 
+UE 回复 RRCReconfigurationComplete 给 gNodeB 
+UE 根据 收到 的 测量 控制 消息 执行 测量 。 UE 测量 并 判定 达到 事件 条件 后
+上报 测量 报告 给 gNodeB 
+gNodeB 收到 测量 报告 后
+根据 测量 结果 进行 切换 策略 和 目标 小区 / 频点 判决 
+源 gNodeB 向 选择 的 目标 小区 所在 的 gNodeB 发起 切换 请求 
+目标 gNodeB 收到 切换 请求 后
+进行 准入 控制
+允许 准入 后 分配 UE 实例 和 传输 资源 
+目标 gNodeB 回复 HANDOVERREQUESTACKNOWLEDGE 给源 gNodeB
+允许 切换 入 。 如果 有 部分 PDUSession 切换 入 失败
+消息 中 需要 携带 失败 的 PDUSession 列表 
+源 gNodeB 发送 RRCReconfiguration 给 UE
+要求 UE 执行 切换 到 目标 小区 
+源 gNodeB 通过 SNSTATUSTRANSFER 将 PDCPSN 号 发送给 目标 gNodeB 
+UE 发送 RRCReconfigurationComplete 给 目标 gNodeB
+UE 空口 切换 到 目标 小区 完成 
+目标 gNodeB 向 AMF 发送 PATHSWITCHREQUEST 消息 通知 UE 已经 改变 小区
+消息 包含 目标 小区 标识 和 所 转换 的 PDUSession 列表 。 核心网 收到 消息 后
+更新 下行 GTPU 数据 面
+将 RAN 侧 的 GTPU 地址 修改 为 目标 gNodeB 
+AMF 向 目标 gNodeB 响应 PATHSWITCHREQUESTACKNOWLEDGE 消息 。 如果 AMF 在 PathSwitchRequestAck 消息 中 指示 核心网 未能 建立 的 PDUSession
+则 gNodeB 删除 未能 建立 的 PDUSession 
+目标 gNodeB 向源 gNodeB 发送 UECONTEXTRELEASE 消息
+源 gNodeB 释放 已 切换 的 用户 
+切换 到 目标 小区 后
+gNodeB 下发 新 小区 的 测量 控制 信息 给 UE 
+UE 收到 gNodeB 下发 新 的 测量 控制 后
+回复 RRCReconfigurationComplete 
+gNodeB 通过 RRCReconfiguration 向 UE 下发 测量 控制
+包含 测量 对象 （ 同频 / 异频 ）
+测量 报告 配置
+GAP 测量 配置 等 
+UE 回复 RRCReconfigurationComplete 给 gNodeB 
+UE 根据 收到 的 测量 控制 消息 执行 测量 。 UE 测量 并 判定 达到 事件 条件 后
+上报 测量 报告 给 gNodeB 
+gNodeB 收到 测量 报告 后
+根据 测量 结果 进行 切换 策略 和 目标 小区 / 频点 判决 
+源 gNodeB 向 NGC 发送 HANDOVERREQUIRED 消息 请求 切换
+消息 包含 目标 gNodeBId 、 执行 数据 转发 PDUSession 列表 等 
+NGC 向 指定 的 目标 小区 所在 的 gNodeB 发起 HANDOVERREQUEST 切换 请求
+gNodeB 根据 消息 中 的 TraceID 、 SPID 识别 出 US 用户 
+目标 gNodeB 收到 切换 请求 后
+进行 准入 控制
+允许 准入 后 分配 UE 实例 和 传输 资源 
+目标 gNodeB 回复 HANDOVERREQUESTACKNOWLEDGE 给 NGC
+允许 切换 入 。 如果 有 部分 PDUSession 切换 入 失败
+消息 中 需要 携带 失败 的 PDUSession 列表 
+NGC 向源 gNodeB 发送 HANDOVERCOMMAND 消息
+消息 中 包含 地址 和 用于 转发 的 TEID 列表
+包含 需要 释放 的 承载 列表 
+源 gNodeB 发送 RRCReconfiguration 给 UE
+要求 UE 执行 切换 到 目标 小区 
+源 gNodeB 将 PDCPSN 号 通过 UPLINKRANSTATUSTRANSFER 发送给 NGC 
+NGC 再 通过 DOWNLINKRANSTATUSTRANSFER 消息 将 PDCPSN 号 发送给 目标 gNodeB 
+UE 发送 RRCReconfigurationComplete 给 目标 gNodeB
+UE 空口 切换 到 目标 小区 完成 
+目标 gNodeB 发送 HANDOVERNOTIFY 给 NGC
+通知 UE 已经 接入 到 目标 小区
+基于 N2 切换 已经 完成 
+切换 到 目标 小区 后
+gNodeB 下发 新 小区 的 测量 控制 信息 给 UE 
+UE 收到 gNodeB 下发 新 的 测量 控制 后
+回复 RRCReconfigurationComplete 
+NGC 向源 gNodeB 发送 UECONTEXTRELEASECOMMAND 消息
+源 gNodeB 释放 切换 的 用户 
+源 gNodeB 向 NGC 回复 UECONTEXTRELEASECOMPLETE 
+源 gNodeB 向 NGC 发送 HANDOVERREQUIRED 消息 请求 切换
+消息 包含 ( TargeteNBID , SourcetoTargetTransparentContainer , intersystemhandoverindication ) 等 
+NGC 向 发送 EPC 发送 Relocationrequest 
+EPC 向 指定 的 目标 小区 所在 的 eNodeB 发起 HANDOVERREQUEST 切换 请求 
+目标 eNodeB 回复 HANDOVERREQUESTACKNOWLEDGE 给 NGC
+允许 切换 入 。 如果 有 部分 E - RAB 承载 切换 入 失败
+消息 中 需要 携带 失败 的 E - RAB 承载 列表 
+EPC 回复 Relocationresponse 给 NGC 
+NGC 向源 gNodeB 发送 HANDOVERCOMMAND 消息
+消息 中 包含 地址 和 用于 转发 的 TEID 列表
+包含 需要 释放 的 承载 列表 
+源 gNodeB 发送 RRCReconfiguration 给 UE
+要求 UE 执行 切换 到 目标 小区 
+UE 发送 RRCReconfigurationComplete 给 目标 gNodeB
+UE 空口 切换 到 目标 小区 完成 
+目标 eNodeB 发送 HANDOVERNOTIFY 给 EPC
+通知 UE 已经 接入 到 目标 小区 
+EPC 收到 HANDOVERNOTIFY 后 给 NGC 发送 RelocationCompleteNotification 
+NGC 收到 RelocationCompleteNotificationAck 消息
+向源 gNodeB 发送 UECONTEXTRELEASECOMMAND 消息
+源 gNodeB 释放 切换 的 用户 
+源 eNodeB 向 EPC 发送 HANDOVERREQUIRED 消息 请求 切换 
+EPC 向 NGC 发送 发送 ForwardRelocationrequest 
+NGC 向 指定 的 目标 小区 所在 的 gNodeB 发起 HANDOVERREQUEST 切换 请求 
+目标 gNodeB 回复 HANDOVERREQUESTACKNOWLEDGE 给 NGC
+允许 切换 入 。 如果 有 部分 承载 切换 入 失败
+消息 中 需要 携带 失败 的 承载 列表 
+NGC 回复 ForwardRelocationresponse 给 EPC 
+EPC 向源 eNodeB 发送 HANDOVERCOMMAND 消息
+消息 中 包含 地址 和 用于 转发 的 TEID 列表
+包含 需要 释放 的 承载 列表 
+源 eNodeB 发送 RRCReconfiguration 给 UE
+要求 UE 执行 切换 到 目标 小区 
+UE 发送 RRCReconfigurationComplete 给 目标 gNodeB
+UE 空口 切换 到 目标 小区 完成 
+目标 gNodeB 发送 HANDOVERNOTIFY 给 NGC
+通知 UE 已经 接入 到 目标 小区 
+NGC 收到 HANDOVERNOTIFY 后 给 EPC 发送 ForwardRelocationCompleteNotification 
+EPC 收到 ForwardRelocationCompleteNotificationAck 消息
+向源 eNodeB 发起 释放 切换 的 用户
