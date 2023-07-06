@@ -3,6 +3,7 @@ from sklearn.metrics import f1_score, classification_report,accuracy_score
 import torch
 import torch.nn as nn
 import numpy as np
+from util.utils import print_2dlist_to_file
 #POS eval
 def pos_eval(model,eval_dataloader,device):
     # Define the evaluation loop
@@ -78,6 +79,7 @@ def pr_eval(model,eval_dataloader,device):
         masks.extend(attention_numpy)
         predictions.extend([list(p) for p in np.argmax(logits, axis=2)])
         true_labels.extend(label_ids)
+    print_2dlist_to_file(predictions, './out/output.txt')
 
     # Flatten the predictions and true labels
     predictions_flat = [p for pred in predictions for p in pred]
@@ -156,7 +158,7 @@ def srl_eval(model,eval_dataloader,device,label_set):
         avg_loss = total_loss / total_examples
         accuracy = total_correct / total_examples
         print("avg_loss:%.6f accuracy:%.6f" % (avg_loss, accuracy))
-
+        print_2dlist_to_file(predictions_list,"/root/autodl-tmp/procedure_knowledge_extract/out/eval_result_pattern.txt")
         # Flatten the predictions and true labels
         predictions_flat = [p for pred in predictions_list for p in pred]
         true_labels_flat = [t for label in true_labels for t in label]

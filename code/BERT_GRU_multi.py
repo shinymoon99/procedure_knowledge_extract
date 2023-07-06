@@ -12,6 +12,7 @@ import torch.multiprocessing as mp
 import torch.distributed as dist
 import torch.utils.data.distributed
 import os
+from util.utils import print_2dlist_to_file
 
 
 class SharedBertModel(torch.nn.Module):
@@ -22,7 +23,16 @@ class SharedBertModel(torch.nn.Module):
     def forward(self, input_ids, attention_mask):
         bert_output = self.bert(input_ids=input_ids, attention_mask=attention_mask)[0]
         return bert_output
-
+def correct_state_dict(state_dict):
+    # Create a new state_dict with modified keys
+    new_state_dict = {}
+    for key, value in state_dict.items():
+        if key.startswith("module."):
+            new_key = key.replace("module.", "")
+            new_state_dict[new_key] = value
+        else:
+            new_state_dict[key] = value
+    return new_state_dict
 def main(rank,world_size,SRL_model,data,l2i,NUM_EPOCHS):
     os.environ['RANK'] = str(rank)
     os.environ['WORLD_SIZE'] = str(world_size)
@@ -63,7 +73,7 @@ def main(rank,world_size,SRL_model,data,l2i,NUM_EPOCHS):
         print(f"epoch:{epoch} time:{end_time - start_time}")
     # save the model from the process with rank 0
     if rank == 0:
-        torch.save(SRL_model.state_dict(), '/root/autodl-tmp/MGTC/fine-tuned_model/srl_model_default/BERT_SRL_weight.pth')
+        torch.save(SRL_model.state_dict(), '/root/autodl-tmp/procedure_knowledge_extract/fine-tuned_model/BERT/BERT_SRL_weight.pth')
     # Clean up
     dist.destroy_process_group()
 
@@ -91,39 +101,39 @@ if __name__ == '__main__':
     SRL_model = Bert_SRL(shared_bert_model.bert, hidden_size, num_labels)
 
 
-    #SRL_model.load_state_dict(torch.load('/root/autodl-tmp/MGTC/fine-tuned_model/srl_model_default/BERT_SRL_weight.pth'))
-
+    # SRL_model.load_state_dict(torch.load('/root/autodl-tmp/MGTC/fine-tuned_model/srl_model_default/BERT_GRU_weight.pth'))
+    # t = torch.load('/root/autodl-tmp/MGTC/fine-tuned_model/srl_model_default/BERT_SRL_weight.pth')
+    # state_dict = correct_state_dict(t)
+    # SRL_model.load_state_dict(state_dict)
 
     """
     load data
     """
     tokenizer = BertTokenizer.from_pretrained("bert-base-chinese")
     # get data
-    with open('/root/autodl-tmp/MGTC/data/data_correct_formated.json', encoding='utf-8') as f:
+    with open('/root/autodl-tmp/procedure_knowledge_extract/data/data_correct_formated.json', encoding='utf-8') as f:
         data = json.load(f)
 
 
-    NUM_EPOCHS = 10
+    NUM_EPOCHS = 1
     mp.spawn(main, args=(torch.cuda.device_count(),SRL_model,data,l2i,NUM_EPOCHS), nprocs=torch.cuda.device_count())
-
-
+    t1 = torch.load('/root/autodl-tmp/procedure_knowledge_extract/fine-tuned_model/BERT/BERT_SRL_weight.pth')
+    state_dict = correct_state_dict(t1)
+    SRL_model.load_state_dict(state_dict)
     """
     eval model
     """
-    state_dict = torch.load('/root/autodl-tmp/MGTC/fine-tuned_model/srl_model_default/BERT_SRL_weight.pth')
-    new_state_dict = {key.replace('module.', ''): value for key, value in state_dict.items()}
-    SRL_model.load_state_dict(new_state_dict)
-
     # Evaluate the models on the respective tasks
 
     device = torch.device('cuda')
     SRL_model.to(device)
     SRL_model.eval()
 
-
     # Define SRL data
-    srl_eval_dataloader = SRL_eval_data_load(data, l2i, 8)
+    srl_eval_dataloader,eval_tokens = SRL_eval_data_load(data, l2i, 8)
+    print_2dlist_to_file(eval_tokens, './out/eval_tokens.txt')
     #SRL eval
     srl_eval(SRL_model,srl_eval_dataloader,device,srl_label_set)
-    torch.save(SRL_model.state_dict(), '/root/autodl-tmp/MGTC/fine-tuned_model/srl_model_default/BERT_SRL_weight.pth')
+
+
 
