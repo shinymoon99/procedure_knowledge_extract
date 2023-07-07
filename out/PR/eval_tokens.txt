@@ -1,0 +1,29 @@
+CLS 如 果 该 会 话 应 用 了 动 态 PCC ， 则 SMF 向 PCF 发 送 Nocf_SMPoLicyControl_DeLete Request 消 息 ， 请 求 删 除 PDU 会 话 相 应 的 信 息 ， 终 止 动 态 策 略 的 下 发 。 
+CLS SMF 断 开 与 PCF 之 间 的 联 系 。 
+CLS PCF 释 放 会 话 资 源 ， 给 SMF 回 Npcf_SMPoLicyControL_DeLete Response 消 息 。 
+CLS SMF 断 开 与 UDM 之 间 的 联 系 。 
+CLS 如 果 SMF 处 理 的 是 UE 最 后 一 个 PDU 会 话 ， 则 SMF 会 执 行 Nudn_SDM_Unsubscribe 取 消 订 阅 签 约 数 据 变 更 通 知 服 务 。 
+CLS SMF 执 行 Nudm_UECM_Deregistration 服 务 操 作 ， 移 除 在 UDM 中 存 储 的 PDU 会 话 与 SMF ID 、 SMF 地 址 以 及 DNN 之 间 的 联 系 。 
+CLS 如 果 AMF 与 PCF 存 在 联 系 并 且 UE 不 再 注 册 到 网 络 ， 则 删 除 AMF 与 PCF 的 AM 策 略 关 联 关 系 。 
+CLS AMF 向 PCF 发 送 Npcf_AMPoLicyControL_DeLete Request 消 息 请 求 删 除 与 PCF 的 AM 策 略 关 联 关 系 。 
+CLS PCF 向 AMF 发 送 Npcf_AMPoLicyControL_Delete Response 消 息 确 认 AM 策 略 控 制 关 联 已 删 除 。 
+CLS 如 果 AMF 与 PCF 之 间 存 在 与 该 UE 相 关 的 关 联 关 系 ， 且 该 UE 在 任 何 接 入 方 式 下 都 不 再 注 册 ， 则 删 除 AMF 与 PCF 的 UE 策 略 关 联 关 系 。 
+CLS AMF 向 PCF 发 送 Npcf_UEPoLicyControL_DeLete Request 消 息 请 求 删 除 与 PCF 的 UE 策 略 关 联 关 系 。 
+CLS PCF 向 AMF 发 送 Npcf_UEPoLicyControL_DeLete Response 消 息 确 认 UE 策 略 关 联 已 删 除 。 
+CLS AMF 发 送 NAS message Deregistration Accept 给 UE （ 该 步 骤 可 选 ， 例 如 去 注 册 类 型 是 switch-off ， 则 不 用 发 送 该 消 息 。 
+CLS AMF 发 送 N 2 UE Context ReLease Request 到 （ R ） AN ， 释 放 N 2 信 令 连 接 。 流 程 结 束 。 
+CLS 如 果 UDM 想 立 即 删 除 用 户 注 册 上 下 文 和 PDU 会 话 ， UDM 发 送 Nudm_UECM_DereqistrationNotification 消 息 给 AMF ， 消 息 中 携 带 Removal Reason 、 SUPI 、 Access Type 等 参 数 。 
+CLS AMF 收 到 消 息 后 在 对 应 的 接 入 网 络 中 执 行 去 注 册 流 程 。 
+CLS AMF 可 发 起 隐 式 去 注 册 和 显 式 去 注 册 两 种 ： 隐 式 去 注 册 是 指 AMF 不 发 送 去 注 册 消 息 给 UE 。 显 式 去 注 册 是 指 AMF 发 送 去 注 册 消 息 给 UE 。 
+CLS 如 果 UE 处 于 OM-IDLE 态 ， AMF 先 寻 呼 UE ， 再 发 去 注 册 请 求 消 息 。 AMF 回 复 Nudm_UECM_DeRegistrationNotification Ack 消 息 给 UDM 。 
+CLS AMF 回 复 Nudm_UECM_DeRegistrationNotification Ack 消 息 给 UDM 。 
+CLS AMF 也 通 过 Nudm_SDM_Unsubscribe 业 务 操 作 取 消 UDM 签 约 数 据 变 更 通 知 的 订 阅 。 
+CLS 如 果 存 在 建 立 的 PDU 会 话 ， 则 执 行 图 1 UE 发 起 的 Deregistration 流 程 中 的 step 2 ~ step 5 。 
+CLS 如 果 AMF 与 PCF 存 在 联 系 并 且 UE 不 再 注 册 到 网 络 ， 则 删 除 AMF 与 PCF 的 AM 策 略 关 联 关 系 。 
+CLS AMF 向 PCF 发 送 Npcf_AMPoLicyControL_DeLete Request 消 息 请 求 删 除 与 PCF 的 AM 策 略 关 联 关 系 。 
+CLS PCF 向 AMF 发 送 Npcf_AMPoLicyControL_Delete Response 消 息 确 认 AM 策 略 控 制 关 联 已 删 除 。 
+CLS 如 果 AMF 与 PCF 之 间 存 在 与 该 UE 相 关 的 关 联 关 系 ， 且 该 UE 在 任 何 接 入 方 式 下 都 不 再 注 册 ， 则 删 除 AMF 与 PCF 的 UE 策 略 关 联 关 系 。 
+CLS AMF 向 PCF 发 送 Npcf_UEPoLicyControL_DeLete Request 消 息 请 求 删 除 与 PCF 的 UE 策 略 关 联 关 系 。 
+CLS PCF 向 AMF 发 送 Nocf_UEPoLicyControL_DeLete Response 消 息 确 认 UE 策 略 关 联 已 删 除 。 
+CLS UE 收 到 步 骤 2 中 AMF 发 送 的 去 注 册 请 求 后 ， UE 给 AMF 回 复 Deregistration Accept 。 
+CLS AMF 给 AN 发 送 N 2 UE CONTEXT RELEASE COMMAND ， 释 放 N 2 信 令 连 接 。 

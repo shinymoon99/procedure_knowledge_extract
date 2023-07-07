@@ -45,7 +45,7 @@ with open('./data/data_correct_formated.json', encoding='utf-8') as f:
     data = json.load(f)
 #Define PR data
 pr_train_dataloader,pr_eval_dataloader,eval_tokens= PR_data_load(data,tokenizer,batch_size=4)
-print_2dlist_to_file(eval_tokens, './out/eval_tokens.txt')
+print_2dlist_to_file(eval_tokens, './out/PR/eval_tokens.txt')
 
 
 """

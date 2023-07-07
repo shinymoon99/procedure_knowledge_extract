@@ -72,6 +72,7 @@ def PR_data_load(data,tokenizer,batch_size):
     pattern = "([-_a-zA-Z()]*\(?([-_a-zA-Z]*)\)?[-_a-zA-Z()]*)"
     sentence_seq = []
     label_seq = []
+    all_tokens = []
     tokenizer = BertTokenizer.from_pretrained('bert-base-chinese')
     for sentence in data:
         sentence_text = sentence['sentence']
@@ -89,19 +90,21 @@ def PR_data_load(data,tokenizer,batch_size):
 
         label_set = ('B-REL', 'I-REL', 'O')
         l2i = {x: i for i, x in enumerate(label_set)}
-        s, i = pr_convert2bertformat(tokenizer, 512, combined_tokens, result_srl, l2i)
+        final_tokens,s, i = pr_convert2bertformat(tokenizer, 512, combined_tokens, result_srl, l2i)
         print(s)
         print(i)
+        all_tokens.append(final_tokens)
         sentence_seq.append(s)
         label_seq.append(i)
     # cut data into train and eval data
     ratio = 0.8
     leng = len(sentence_seq)
     # Define the input sentences and their corresponding predicate labels for training
-    train_tokens = sentence_seq[:int(leng * ratio)]
+    train_token_ids = sentence_seq[:int(leng * ratio)]
     train_rel = label_seq[:int(leng * ratio)]
 
-    eval_tokens = sentence_seq[int(leng * ratio):]
+    eval_token_ids = sentence_seq[int(leng * ratio):]
+    eval_tokens = all_tokens[int(leng*ratio):]
     eval_rel = label_seq[int(leng * ratio):]
 
     # train_tokens = sentence_seq[:1]
@@ -110,9 +113,9 @@ def PR_data_load(data,tokenizer,batch_size):
     # eval_tokens = sentence_seq[1:2]
     # eval_rel = label_seq[1:2]
     # Convert the tokenized inputs and labels to PyTorch tensors
-    train_inputs = torch.tensor(train_tokens)
+    train_inputs = torch.tensor(train_token_ids)
     train_labels = torch.tensor(train_rel)
-    eval_inputs = torch.tensor(eval_tokens)
+    eval_inputs = torch.tensor(eval_token_ids)
     eval_labels = torch.tensor(eval_rel)
 
     # Define the data loaders for training and evaluation

@@ -55,12 +55,12 @@ def pr_convert2bertformat(tokenizer,dim,token_seq,label_seq,l2i):
     temp_label_seq = ['O']+label_seq
 
     #convert to id
-    temp_token_seq = tokenizer.convert_tokens_to_ids(temp_token_seq)
-    temp_label_seq = [l2i[x] for x in temp_label_seq]
+    temp_token_ids = tokenizer.convert_tokens_to_ids(temp_token_seq)
+    temp_label_ids = [l2i[x] for x in temp_label_seq]
     # add pad
-    temp_token_seq = temp_token_seq + [0]*(dim-len(temp_token_seq))
-    temp_label_seq = temp_label_seq + [-1]*(dim-len(temp_label_seq))
-    return temp_token_seq,temp_label_seq
+    temp_token_ids = temp_token_ids + [0]*(dim-len(temp_token_ids))
+    temp_label_ids = temp_label_ids + [-1]*(dim-len(temp_label_ids))
+    return temp_token_seq,temp_token_ids,temp_label_ids
 if  __name__=='__main__':
     with open('/data/data.json', encoding='utf-8') as f:
         data = json.load(f)
