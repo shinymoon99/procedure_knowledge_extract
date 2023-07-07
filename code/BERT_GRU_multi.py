@@ -1,3 +1,5 @@
+import sys
+sys.path.append('D:\pycode\procedure_knowledge_extract')
 import torch
 import torch.nn as nn
 from transformers import BertModel, BertTokenizer, BertForTokenClassification
@@ -73,7 +75,7 @@ def main(rank,world_size,SRL_model,data,l2i,NUM_EPOCHS):
         print(f"epoch:{epoch} time:{end_time - start_time}")
     # save the model from the process with rank 0
     if rank == 0:
-        torch.save(SRL_model.state_dict(), '/root/autodl-tmp/procedure_knowledge_extract/fine-tuned_model/BERT/BERT_SRL_weight.pth')
+        torch.save(SRL_model.state_dict(), './fine-tuned_model/BERT/BERT_SRL_weight.pth')
     # Clean up
     dist.destroy_process_group()
 
@@ -111,13 +113,13 @@ if __name__ == '__main__':
     """
     tokenizer = BertTokenizer.from_pretrained("bert-base-chinese")
     # get data
-    with open('/root/autodl-tmp/procedure_knowledge_extract/data/data_correct_formated.json', encoding='utf-8') as f:
+    with open('./data/data_correct_formated.json', encoding='utf-8') as f:
         data = json.load(f)
 
 
     NUM_EPOCHS = 1
     mp.spawn(main, args=(torch.cuda.device_count(),SRL_model,data,l2i,NUM_EPOCHS), nprocs=torch.cuda.device_count())
-    t1 = torch.load('/root/autodl-tmp/procedure_knowledge_extract/fine-tuned_model/BERT/BERT_SRL_weight.pth')
+    t1 = torch.load('./fine-tuned_model/BERT/BERT_SRL_weight.pth')
     state_dict = correct_state_dict(t1)
     SRL_model.load_state_dict(state_dict)
     """

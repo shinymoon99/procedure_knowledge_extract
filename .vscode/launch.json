@@ -12,7 +12,7 @@
             "console": "integratedTerminal",
             "justMyCode": false,
             "env": {
-                "PYTHONPATH": "${workspaceFolder}:${env:PYTHONPATH}"
+                "PYTHONPATH": "D:/pycode/procedure_knowledge_extract:${env:PYTHONPATH}"
               }
         }
     ]

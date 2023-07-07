@@ -124,7 +124,7 @@ def PR_data_load(data,tokenizer,batch_size):
     eval_sampler = SequentialSampler(eval_dataset)
     eval_dataloader = DataLoader(eval_dataset, sampler=eval_sampler, batch_size=batch_size)
 
-    return train_dataloader,eval_dataloader
+    return train_dataloader,eval_dataloader,eval_tokens
 
 def SRL_data_load(data,l2i,batch_size,world_size=None,rank=None):
     pattern = "([-_a-zA-Z()]*\(?([-_a-zA-Z]*)\)?[-_a-zA-Z()]*)"
