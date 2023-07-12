@@ -1,5 +1,5 @@
 import sys
-sys.path.append('D:\pycode\procedure_knowledge_extract')
+sys.path.append('./')
 import torch
 import torch.nn as nn
 from transformers import BertModel, BertTokenizer, BertForTokenClassification

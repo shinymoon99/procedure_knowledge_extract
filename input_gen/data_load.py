@@ -68,7 +68,7 @@ def POS_data_load(data,tokenizer,batch_size):
 
     return train_dataloader, eval_dataloader
 
-def PR_data_load(data,tokenizer,batch_size):
+def PR_data_load(data,tokenizer,batch_size,ratio):
     pattern = "([-_a-zA-Z()]*\(?([-_a-zA-Z]*)\)?[-_a-zA-Z()]*)"
     sentence_seq = []
     label_seq = []
@@ -97,7 +97,6 @@ def PR_data_load(data,tokenizer,batch_size):
         sentence_seq.append(s)
         label_seq.append(i)
     # cut data into train and eval data
-    ratio = 0.8
     leng = len(sentence_seq)
     # Define the input sentences and their corresponding predicate labels for training
     train_token_ids = sentence_seq[:int(leng * ratio)]
@@ -128,7 +127,17 @@ def PR_data_load(data,tokenizer,batch_size):
     eval_dataloader = DataLoader(eval_dataset, sampler=eval_sampler, batch_size=batch_size)
 
     return train_dataloader,eval_dataloader,eval_tokens
-
+def PR_eval_labels_load(data,ratio):
+    sentenceslabels = []
+    eval_labels = []
+    for sentence_info in data:
+        sentencelabels = []
+        for label_set in sentence_info['labels']:
+            sentencelabels.append(label_set['REL'])
+        sentenceslabels.append(sentencelabels)
+    leng = len(sentenceslabels)
+    eval_labels = sentenceslabels[int(leng*ratio):]
+    return eval_labels 
 def SRL_data_load(data,l2i,batch_size,world_size=None,rank=None):
     pattern = "([-_a-zA-Z()]*\(?([-_a-zA-Z]*)\)?[-_a-zA-Z()]*)"
     tokenized_sentence = []

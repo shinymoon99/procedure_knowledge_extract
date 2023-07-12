@@ -1,3 +1,8 @@
+import re
+import json
+import csv
+import matplotlib.pyplot as plt
+
 def get_positions(numbers, target):
     positions = []
     start = None
@@ -68,16 +73,88 @@ def get_token_labels(token_pos_dict, tokens):
         if key != -1:
             label_tokens = []
             for pos in token_pos_dict[key]:
-                label_tokens.extend(tokens[pos[0]:pos[1]+1])
-            combined_tokens = '|'.join(label_tokens)
-            if key in labels:
-                labels[key].append(combined_tokens)
-            else:
-                labels[key] = [combined_tokens]
+                label_tokens.append('|'.join(tokens[pos[0]:pos[1]+1]))
+            #combined_tokens = '|'.join(label_tokens)
+            labels[key] = label_tokens
     return labels
+def getPRTokenLabels(token_pos_list,tokens):
+    labels4sentence = []
+    for pos in token_pos_list:
+        t = tokens[pos[0]:pos[1]+1]
+        labels4sentence.append('|'.join(t))
+    return labels4sentence
 def getLabels4TokensList(token_pos_dict_list, tokens_list):
     labels_list = []
     for i in range(len(tokens_list)):
         t = get_token_labels(token_pos_dict_list[i],tokens_list[i])
         labels_list.append(t)
     return labels_list
+def getPRPosFromPattern(lst):
+    pattern = '01*'
+    matches = [(m.start(), m.end()-1) for m in re.finditer(pattern, ''.join(map(str, lst)))]
+    return matches
+def convert_negatives(lst):
+    for i in range(len(lst)):
+        for j in range(len(lst[i])):
+            if lst[i][j] == -1:
+                lst[i][j] = 3
+    return lst
+def extractPredicate(filename):
+    p = set()
+    with open(filename, encoding='utf-8') as f:
+        data = json.load(f)
+    for sen in data:
+        for proposition in sen:
+            p.add(proposition['REL'])
+    return p 
+def filterPredicate(predicate_list,pset):
+    filtered_list = []
+    for predicates in predicate_list:
+        t = []
+        for p in predicates:
+            if p in pset:
+                t.append(p)
+        filtered_list.append(t)
+    return filtered_list
+
+
+def write_loss_values_to_csv(loss_values, output_file):
+    # Open the CSV file in write mode
+    with open(output_file, "w", newline="") as file:
+        writer = csv.writer(file)
+
+        # Write the header row
+        writer.writerow(["Loss"])
+
+        # Write each loss value as a row in the CSV file
+        for loss in loss_values:
+            writer.writerow([loss])
+def append_loss_values_to_csv(loss_values, output_file):
+    # Open the CSV file in append mode
+    with open(output_file, "a", newline="") as file:
+        writer = csv.writer(file)
+
+        # Write each loss value as a row in the CSV file
+        for loss in loss_values:
+            writer.writerow([loss])
+
+def draw_and_save_loss_curve(loss_list, file_path):
+    # create a figure and axis object
+    fig, ax = plt.subplots()
+    # plot the loss curve
+    ax.plot(loss_list)
+    # set the axis labels and title
+    ax.set_xlabel('Epoch')
+    ax.set_ylabel('Loss')
+    ax.set_title('Training Loss Curve')
+
+    # save the plot to a file
+    fig.savefig(file_path)
+
+    # show the plot
+    plt.show()
+def read_list_from_csv(file_path):
+    with open(file_path, 'r') as file:
+        reader = csv.reader(file)
+        data_list = [row[0] for row in reader]
+    return data_list

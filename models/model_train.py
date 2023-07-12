@@ -44,6 +44,7 @@ def pr_train(model, pr_train_dataloader, device, optimizer,scheduler,weight):
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
         optimizer.step()
         scheduler.step()
+    return loss
 # Train the SRL model
 def srl_train(model, srl_train_dataloader, device, optimizer,scheduler,class_weight,rank=None,):
     total_loss = 0.0

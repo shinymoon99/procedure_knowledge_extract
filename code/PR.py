@@ -4,10 +4,11 @@ import torch
 import torch.nn as nn
 from transformers import BertModel, BertTokenizer, BertForTokenClassification
 from models.model import  Bert_GRU,WeightedBertForTokenClassification
-from input_gen.data_load import POS_data_load,PR_data_load,SRL_data_load,pos_label_set
+from input_gen.data_load import POS_data_load,PR_data_load,SRL_data_load,pos_label_set,PR_eval_labels_load
 from models.model_train import pos_train,pr_train,srl_train
 from models.model_eval import pos_eval,pr_eval,srl_eval
-from util.utils import print_2dlist_to_file
+from util.utils import print_2dlist_to_file,append_loss_values_to_csv,draw_and_save_loss_curve,read_list_from_csv
+from sklearn.metrics import precision_recall_fscore_support
 import transformers
 import json
 import time
@@ -44,7 +45,9 @@ tokenizer = BertTokenizer.from_pretrained("bert-base-chinese")
 with open('./data/data_correct_formated.json', encoding='utf-8') as f:
     data = json.load(f)
 #Define PR data
-pr_train_dataloader,pr_eval_dataloader,eval_tokens= PR_data_load(data,tokenizer,batch_size=4)
+ratio = 0.8
+pr_train_dataloader,pr_eval_dataloader,eval_tokens= PR_data_load(data,tokenizer,batch_size=4,ratio=ratio)
+eval_labels_list = PR_eval_labels_load(data,ratio)
 print_2dlist_to_file(eval_tokens, './out/PR/eval_tokens.txt')
 
 
@@ -70,21 +73,54 @@ pr_scheduler = transformers.get_linear_schedule_with_warmup(pr_optimizer, num_wa
 
 NUM_EPOCHS = 1
 
-
+losses = []
 for epoch in range(NUM_EPOCHS):
     start_time = time.time()
     # Train the PR model
-    pr_train(PR_model,pr_train_dataloader,device,pr_optimizer,pr_scheduler,class_weight)
+    loss = pr_train(PR_model,pr_train_dataloader,device,pr_optimizer,pr_scheduler,class_weight)
     end_time = time.time()
+    losses.append(loss)
     print(f"epoch:{epoch} time:{end_time-start_time}")
+append_loss_values_to_csv(losses,"./out/PR/loss_log.csv")
+whole_loss = read_list_from_csv('./out/PR/loss_log.csv')
+draw_and_save_loss_curve(whole_loss,'./out/PR/loss_curve.png')
 """
 eval model
 """
 # Evaluate the models on the respective tasks
 PR_model.eval()
-#PR eval
+#PR span-based eval
 pr_eval(PR_model,pr_eval_dataloader,device)
+#PR semantic-based eval
+from util.utils import getPRPosFromPattern,read_2dintlist_from_file,read_2dstrlist_from_file,convert_negatives,getPRTokenLabels,extractPredicate,filterPredicate
+pattern = read_2dintlist_from_file('./out/PR/eval_result_pattern.txt')
+tokens = read_2dstrlist_from_file('./out/PR/eval_tokens.txt')
+patterns = convert_negatives(pattern)
+positions = []
+for p in patterns:
+    t = getPRPosFromPattern(p)
+    positions.append(t)
+result = []
+for i in range(len(positions)):
+    t1 = getPRTokenLabels(positions[i],tokens[i])
+    result.append(t1)
+print(positions)
+#using template to filter
+pset = extractPredicate('./data/data_correct_formated.json')
+predicate_list = filterPredicate(result,pset)
 
+
+
+
+# calculate the precision, recall, and F1 score for each label
+precision, recall, f1_score, support = precision_recall_fscore_support(eval_labels_list, predicate_list, average=None)
+# print the results for each label
+for i in range(len(precision)):
+    print('Label:', i)
+    print('Precision:', precision[i])
+    print('Recall:', recall[i])
+    print('F1 Score:', f1_score[i])
+    print('Support:', support[i])
 """
 save model
 """
