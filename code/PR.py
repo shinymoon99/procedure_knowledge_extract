@@ -8,6 +8,7 @@ from input_gen.data_load import POS_data_load,PR_data_load,SRL_data_load,pos_lab
 from models.model_train import pos_train,pr_train,srl_train
 from models.model_eval import pos_eval,pr_eval,srl_eval
 from util.utils import print_2dlist_to_file,append_loss_values_to_csv,draw_and_save_loss_curve,read_list_from_csv
+from util.eval import recall,precision,f1_score
 from sklearn.metrics import precision_recall_fscore_support
 import transformers
 import json
@@ -135,6 +136,8 @@ for i in range(len(precision)):
     print('Recall:', recall[i])
     print('F1 Score:', f1_score[i])
     print('Support:', support[i])
+p,r,f = f1_score(predicate_list,eval_labels_list)
+print("p:%f r:%f f:%f",p,r,f)
 """
 save model
 """
