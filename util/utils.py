@@ -104,14 +104,14 @@ def extractPredicate(filename):
     with open(filename, encoding='utf-8') as f:
         data = json.load(f)
     for sen in data:
-        for proposition in sen:
+        for proposition in sen['labels']:
             p.add(proposition['REL'])
     return p 
 def filterPredicate(predicate_list,pset):
     filtered_list = []
     for predicates in predicate_list:
         t = []
-        for p in predicates:
+        for p in [s.replace('|', '') for s in predicates]:
             if p in pset:
                 t.append(p)
         filtered_list.append(t)

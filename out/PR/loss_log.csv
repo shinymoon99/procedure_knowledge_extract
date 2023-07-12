@@ -1,0 +1,5 @@
+"tensor(0.1916, device='cuda:0', grad_fn=<NllLossBackward0>)"
+"tensor(0.1395, device='cuda:0', grad_fn=<NllLossBackward0>)"
+"tensor(0.3317, device='cuda:0', grad_fn=<NllLossBackward0>)"
+"tensor(0.1262, device='cuda:0', grad_fn=<NllLossBackward0>)"
+"tensor(0.0737, device='cuda:0', grad_fn=<NllLossBackward0>)"
