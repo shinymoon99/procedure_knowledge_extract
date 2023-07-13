@@ -76,7 +76,7 @@ def main(rank,world_size,SRL_model,data,l2i,NUM_EPOCHS):
         print(f"epoch:{epoch} time:{end_time - start_time}")
     # save the model from the process with rank 0
     if rank == 0:
-        torch.save(SRL_model.state_dict(), './fine-tuned_model/BERT/BERT_SRL_weight.pth')
+        torch.save(SRL_model.state_dict(), './fine-tuned_model/SRL/BERT_SRL_weight.pth')
     # Clean up
     dist.destroy_process_group()
 
@@ -120,7 +120,11 @@ if __name__ == '__main__':
 
     NUM_EPOCHS = 1
     mp.spawn(main, args=(torch.cuda.device_count(),SRL_model,data,l2i,NUM_EPOCHS), nprocs=torch.cuda.device_count())
-    t1 = torch.load('./fine-tuned_model/BERT/BERT_SRL_weight.pth')
+    if os.path.isfile('./fine-tuned_model/SRL/BERT_SRL_weight.pth'):
+        t1 = torch.load('./fine-tuned_model/SRL/BERT_SRL_weight.pth')
+    else:
+        pass
+    
     state_dict = correct_state_dict(t1)
     SRL_model.load_state_dict(state_dict)
     """
@@ -132,11 +136,13 @@ if __name__ == '__main__':
     SRL_model.to(device)
     SRL_model.eval()
     gold_arguments_list = extract_arguments('./data/data_correct_formated.json')
-    arguments_list = getGoldSRL('out\SRL\eval_result_pattern.txt','out\SRL\eval_tokens.txt')
+    # TODO: this ratio should be synchronized with dataload part, which is editable
+    gold_arguments_list = gold_arguments_list[int(0.8*len(gold_arguments_list)):]
+    arguments_list = getGoldSRL('./out/SRL/eval_result_pattern.txt','./out/SRL/eval_tokens.txt')
     p,r,f = calculate_f1_score(arguments_list,gold_arguments_list)
     # Define SRL data
     srl_eval_dataloader,eval_tokens = SRL_eval_data_load(data, l2i, 8)
-    print_2dlist_to_file(eval_tokens, './out/eval_tokens.txt')
+    print_2dlist_to_file(eval_tokens, './out/SRL/eval_tokens.txt')
     #SRL eval
     srl_eval(SRL_model,srl_eval_dataloader,device,srl_label_set)
 
