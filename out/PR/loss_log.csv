@@ -3,3 +3,8 @@
 "tensor(0.3317, device='cuda:0', grad_fn=<NllLossBackward0>)"
 "tensor(0.1262, device='cuda:0', grad_fn=<NllLossBackward0>)"
 "tensor(0.0737, device='cuda:0', grad_fn=<NllLossBackward0>)"
+"tensor(0.1603, device='cuda:0', grad_fn=<NllLossBackward0>)"
+"tensor(0.1135, device='cuda:0', grad_fn=<NllLossBackward0>)"
+"tensor(0.1154, device='cuda:0', grad_fn=<NllLossBackward0>)"
+"tensor(0.0632, device='cuda:0', grad_fn=<NllLossBackward0>)"
+"tensor(0.0907, device='cuda:0', grad_fn=<NllLossBackward0>)"

@@ -26,7 +26,7 @@ def recall(predicted, gold_standard):
     return recall
 
 
-def f1_score(predicted, gold_standard):
+def calculate_f1_score(predicted, gold_standard):
     prec = precision(predicted, gold_standard)
     rec = recall(predicted, gold_standard)
     f1 = 2 * ((prec * rec) / (prec + rec))
