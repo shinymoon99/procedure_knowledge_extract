@@ -14,7 +14,8 @@ import torch.multiprocessing as mp
 import torch.distributed as dist
 import torch.utils.data.distributed
 import os
-from util.utils import print_2dlist_to_file
+from util.utils import print_2dlist_to_file,extract_arguments
+from util.eval import getGoldSRL,calculate_f1_score
 
 
 class SharedBertModel(torch.nn.Module):
@@ -130,7 +131,9 @@ if __name__ == '__main__':
     device = torch.device('cuda')
     SRL_model.to(device)
     SRL_model.eval()
-
+    gold_arguments_list = extract_arguments('./data/data_correct_formated.json')
+    arguments_list = getGoldSRL('out\SRL\eval_result_pattern.txt','out\SRL\eval_tokens.txt')
+    p,r,f = calculate_f1_score(arguments_list,gold_arguments_list)
     # Define SRL data
     srl_eval_dataloader,eval_tokens = SRL_eval_data_load(data, l2i, 8)
     print_2dlist_to_file(eval_tokens, './out/eval_tokens.txt')

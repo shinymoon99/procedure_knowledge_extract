@@ -39,6 +39,7 @@ def pr_train(model, pr_train_dataloader, device, optimizer,scheduler,weight):
         attention_mask = attention_mask.to(device)
         weight = weight.to(device)
         outputs = model(batch_inputs, labels=batch_labels, attention_mask=attention_mask,weight=weight)
+        # TODO: the loss may be not batch loss, I forget it(may be the mistake is in SRL or PR, maybe in both), I should check it out
         loss = outputs.loss
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)

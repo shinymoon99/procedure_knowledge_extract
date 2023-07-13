@@ -17,5 +17,30 @@ result = []
 for i in range(len(positions)):
     t1 = get_token_labels(positions[i],tokens[i])
     result.append(t1)
+
 print(positions)
-#using 
+"""
+    convert to normal form
+"""
+result1 = result.copy()
+#only save the first one and delete '|'
+for pro in result1:
+    for key,value in pro.items():
+        if isinstance(value,list):
+            pro[key] = value[0].replace('|','')
+        else:
+            pro[key] = value.replace('|','')
+#edit the keys from index to actual label
+srl_label_set = ("O","A0","A1","A2","A3","A4","ADV","CND","PRP","TMP","MNR")
+#srl_label_set = ("O","A0","A1","A2")
+num_labels = len(srl_label_set)  # Number of labels: B-PRED, I-PRED, B-CON
+i2l = { i:label for i, label in enumerate(srl_label_set)}
+prediction_SRL_list = []
+for pro in result1:
+    new_dict = {i2l.get(k,k):v for k,v in pro.items()}
+    prediction_SRL_list.append(new_dict)
+print(prediction_SRL_list)
+
+
+        
+

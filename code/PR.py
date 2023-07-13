@@ -8,7 +8,7 @@ from input_gen.data_load import POS_data_load,PR_data_load,SRL_data_load,pos_lab
 from models.model_train import pos_train,pr_train,srl_train
 from models.model_eval import pos_eval,pr_eval,srl_eval
 from util.utils import print_2dlist_to_file,append_loss_values_to_csv,draw_and_save_loss_curve,read_list_from_csv
-from util.eval import recall,precision,calculate_f1_score
+from util.eval import recall,precision,calculate_f1_score,getGoldSRL
 from sklearn.metrics import precision_recall_fscore_support
 import transformers
 import json
@@ -35,9 +35,10 @@ model_name = 'bert-base-chinese'
 class_weight = torch.tensor([ 100.0,100.0,1.0]) # assign higher weight to predicate class
 PR_model = WeightedBertForTokenClassification.from_pretrained(model_name, num_labels=3,ignore_mismatched_sizes=True)
 
-
-#PR_model.load_state_dict(torch.load('/root/autodl-tmp/MGTC/fine-tuned_model/multi_model/PR_model_weight.pth'))
-
+if os.path.isfile('./fine-tuned_model/multi_model/PR_model_weight.pth'):
+    PR_model.load_state_dict(torch.load('./fine-tuned_model/multi_model/PR_model_weight.pth'))
+else:
+    pass
 """
 load data
 """
@@ -80,7 +81,7 @@ for epoch in range(NUM_EPOCHS):
     # Train the PR model
     loss = pr_train(PR_model,pr_train_dataloader,device,pr_optimizer,pr_scheduler,class_weight)
     end_time = time.time()
-    losses.append(loss)
+    losses.append(loss.item())
     print(f"epoch:{epoch} time:{end_time-start_time}")
 append_loss_values_to_csv(losses,"./out/PR/loss_log.csv")
 whole_loss = read_list_from_csv('./out/PR/loss_log.csv')
@@ -110,32 +111,6 @@ print(positions)
 pset = extractPredicate('./data/data_correct_formated.json')
 predicate_list = filterPredicate(result,pset)
 
-
-
-
-from sklearn.preprocessing import MultiLabelBinarizer
-from sklearn.metrics import precision_recall_fscore_support
-
-
-# Create MultiLabelBinarizer object and fit to labels
-mlb = MultiLabelBinarizer()
-mlb.fit(eval_labels_list)
-
-# Transform labels to binary array
-y_true = mlb.transform(eval_labels_list)
-y_pred = mlb.transform(predicate_list)
-
-# Compute precision, recall, f1-score, and support
-precision, recall, f1_score, support = precision_recall_fscore_support(y_true, y_pred, average=None)
-
-print(precision, recall, f1_score, support)
-# print the results for each label
-for i in range(len(precision)):
-    print('Label:', i)
-    print('Precision:', precision[i])
-    print('Recall:', recall[i])
-    print('F1 Score:', f1_score[i])
-    print('Support:', support[i])
 p,r,f = calculate_f1_score(predicate_list,eval_labels_list)
 print("p:{:.2f} r:{:.2f} f:{:.2f}".format(p,r,f))
 """

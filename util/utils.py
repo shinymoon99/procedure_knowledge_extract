@@ -116,7 +116,22 @@ def filterPredicate(predicate_list,pset):
                 t.append(p)
         filtered_list.append(t)
     return filtered_list
-
+def extract_arguments(json_file):
+    with open(json_file, 'r',encoding='utf-8') as file:
+        data = json.load(file)
+    # p_arguments = [['ARG':,'ARGM']]
+    p_arguments = []
+    
+    for sen_info in data:
+        labels = sen_info.get('labels', [])
+        for proposition in labels:
+            arguments = {}
+            args = proposition.get('ARG', {})
+            argms = proposition.get('ARGM', {})
+            arguments.update(args)
+            arguments.update(argms)
+            p_arguments.append(arguments)
+    return p_arguments
 
 def write_loss_values_to_csv(loss_values, output_file):
     # Open the CSV file in write mode

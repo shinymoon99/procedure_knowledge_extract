@@ -1,16 +1,24 @@
-import re
-import sys
-sys.path.append('./')
-from util.utils import getPRPosFromPattern,read_2dintlist_from_file,read_2dstrlist_from_file,convert_negatives,get_token_labels,getPRTokenLabels
-pattern = read_2dintlist_from_file('./out/PR/eval_result_pattern.txt')
-tokens = read_2dstrlist_from_file('./out/PR/eval_tokens.txt')
-patterns = convert_negatives(pattern)
-positions = []
-for p in patterns:
-    t = getPRPosFromPattern(p)
-    positions.append(t)
-result = []
-for i in range(len(positions)):
-    t1 = getPRTokenLabels(positions[i],tokens[i])
-    result.append(t1)
-print(positions)
+import json
+
+def extract_arguments(json_file):
+    with open(json_file, 'r',encoding='utf-8') as file:
+        data = json.load(file)
+    # p_arguments = [['ARG':,'ARGM']]
+    p_arguments = []
+    
+    for sen_info in data:
+        labels = sen_info.get('labels', [])
+        for proposition in labels:
+            arguments = {}
+            args = proposition.get('ARG', {})
+            argms = proposition.get('ARGM', {})
+            arguments.update(args)
+            arguments.update(argms)
+            p_arguments.append(arguments)
+    return p_arguments
+json_file = './data/data_correct_formated.json'
+arguments = extract_arguments(json_file)
+
+# Print the extracted ARG and ARGM values
+for arg in arguments:
+    print(arg)

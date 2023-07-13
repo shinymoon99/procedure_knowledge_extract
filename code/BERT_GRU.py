@@ -13,7 +13,8 @@ import json
 import time
 import torch.distributed as dist
 import torch.multiprocessing as mp
-
+from util.utils import extract_arguments
+from util.eval import calculate_f1_score,getGoldSRL
 
 """
 load model
@@ -42,7 +43,7 @@ SRL_model = Bert_SRL(shared_bert_model.bert, hidden_size, num_labels)
 
 
 #SRL_model.load_state_dict(torch.load('/root/autodl-tmp/MGTC/fine-tuned_model/srl_model_default/BERT_GRU_weight.pth'))
-SRL_model.load_state_dict(torch.load('./fine-tuned_model/BERT/BERT_SRL_weight.pth'))
+#SRL_model.load_state_dict(torch.load('./fine-tuned_model/BERT/SRL/BERT_SRL_weight.pth'))
 
 """
 load data and model
@@ -58,8 +59,8 @@ srl_train_dataloader,srl_eval_dataloader = SRL_data_load(data,l2i,8)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)
 
-SRL_model = nn.DataParallel(SRL_model,device_ids = [0,1])
-SRL_model.to(device)
+# SRL_model = nn.DataParallel(SRL_model,device_ids = [0,1])
+# SRL_model.to(device)
 """
 train model
 """
@@ -96,6 +97,9 @@ SRL_model.eval()
 #SRL eval 
 srl_eval(SRL_model,srl_eval_dataloader,device,srl_label_set)
 
+gold_arguments_list = extract_arguments('./data/data_correct_formated.json')
+arguments_list = getGoldSRL('out\SRL\eval_result_pattern.txt','out\SRL\eval_tokens.txt')
+p,r,f = calculate_f1_score(arguments_list,gold_arguments_list)
 """
 save model
 """
