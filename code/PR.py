@@ -35,8 +35,8 @@ model_name = 'bert-base-chinese'
 class_weight = torch.tensor([ 100.0,100.0,1.0]) # assign higher weight to predicate class
 PR_model = WeightedBertForTokenClassification.from_pretrained(model_name, num_labels=3,ignore_mismatched_sizes=True)
 
-if os.path.isfile('./fine-tuned_model/multi_model/PR_model_weight.pth'):
-    PR_model.load_state_dict(torch.load('./fine-tuned_model/multi_model/PR_model_weight.pth'))
+if os.path.isfile('./fine-tuned_model/PR/BERT/PR_model_weight.pth'):
+    PR_model.load_state_dict(torch.load('./fine-tuned_model/PR/BERT/PR_model_weight.pth'))
 else:
     pass
 """
@@ -73,7 +73,7 @@ pr_optimizer = torch.optim.Adam(PR_model.parameters(), lr=LEARNING_RATE)
 pr_total_steps = len(pr_train_dataloader) * 10  # 10 epochs
 pr_scheduler = transformers.get_linear_schedule_with_warmup(pr_optimizer, num_warmup_steps=0, num_training_steps=pr_total_steps)
 
-NUM_EPOCHS = 1
+NUM_EPOCHS = 100
 
 losses = []
 for epoch in range(NUM_EPOCHS):
@@ -116,4 +116,4 @@ print("p:{:.2f} r:{:.2f} f:{:.2f}".format(p,r,f))
 """
 save model
 """
-torch.save(PR_model.state_dict(), './fine-tuned_model/PR/PR_model_weight.pth')
+torch.save(PR_model.state_dict(), './fine-tuned_model/PR/BERT/PR_model_weight.pth')

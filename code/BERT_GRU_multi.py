@@ -14,7 +14,7 @@ import torch.multiprocessing as mp
 import torch.distributed as dist
 import torch.utils.data.distributed
 import os
-from util.utils import print_2dlist_to_file,extract_arguments
+from util.utils import print_2dlist_to_file,extract_arguments,append_loss_values_to_csv,draw_and_save_loss_curve,read_list_from_csv
 from util.eval import getGoldSRL,calculate_f1_score
 
 
@@ -67,13 +67,19 @@ def main(rank,world_size,SRL_model,data,l2i,NUM_EPOCHS):
                                                                  num_training_steps=srl_total_steps)
 
     class_weight = torch.tensor([1.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0])
+    losses = []
     for epoch in range(NUM_EPOCHS):
         start_time = time.time()
 
         # Train the SRL model
-        srl_train(SRL_model, srl_train_dataloader, rank, srl_optimizer, srl_scheduler, class_weight)
+        loss = srl_train(SRL_model, srl_train_dataloader, rank, srl_optimizer, srl_scheduler, class_weight)
         end_time = time.time()
         print(f"epoch:{epoch} time:{end_time - start_time}")
+        losses.append(loss)
+    
+    append_loss_values_to_csv(losses,"./out/SRL/loss_log.csv")
+    whole_loss = read_list_from_csv('./out/SRL/loss_log.csv')
+    draw_and_save_loss_curve(whole_loss,'./out/SRL/loss_curve.png')
     # save the model from the process with rank 0
     if rank == 0:
         torch.save(SRL_model.state_dict(), './fine-tuned_model/SRL/BERT_SRL_weight.pth')
@@ -118,7 +124,7 @@ if __name__ == '__main__':
         data = json.load(f)
 
 
-    NUM_EPOCHS = 1
+    NUM_EPOCHS = 150
     mp.spawn(main, args=(torch.cuda.device_count(),SRL_model,data,l2i,NUM_EPOCHS), nprocs=torch.cuda.device_count())
     if os.path.isfile('./fine-tuned_model/SRL/BERT_SRL_weight.pth'):
         t1 = torch.load('./fine-tuned_model/SRL/BERT_SRL_weight.pth')
@@ -136,15 +142,16 @@ if __name__ == '__main__':
     SRL_model.to(device)
     SRL_model.eval()
     gold_arguments_list = extract_arguments('./data/data_correct_formated.json')
-    # TODO: this ratio should be synchronized with dataload part, which is editable
-    gold_arguments_list = gold_arguments_list[int(0.8*len(gold_arguments_list)):]
-    arguments_list = getGoldSRL('./out/SRL/eval_result_pattern.txt','./out/SRL/eval_tokens.txt')
-    p,r,f = calculate_f1_score(arguments_list,gold_arguments_list)
+
     # Define SRL data
     srl_eval_dataloader,eval_tokens = SRL_eval_data_load(data, l2i, 8)
     print_2dlist_to_file(eval_tokens, './out/SRL/eval_tokens.txt')
     #SRL eval
     srl_eval(SRL_model,srl_eval_dataloader,device,srl_label_set)
-
+    # TODO: this ratio should be synchronized with dataload part, which is editable
+    gold_arguments_list = gold_arguments_list[int(0.8*len(gold_arguments_list)):]
+    arguments_list = getGoldSRL('./out/SRL/eval_result_pattern.txt','./out/SRL/eval_tokens.txt')
+    p,r,f = calculate_f1_score(arguments_list,gold_arguments_list)
+    print("p:{:.2f} r:{:.2f} f:{:.2f}".format(p,r,f))
 
 

@@ -98,3 +98,4 @@ def srl_train(model, srl_train_dataloader, device, optimizer,scheduler,class_wei
 
         optimizer.step()
         scheduler.step()
+    return total_loss
