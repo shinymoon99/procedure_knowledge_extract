@@ -8,3 +8,14 @@ Label PRP: precision=0.7810, recall=0.6646, f1=0.7181,support=161
 Label TMP: precision=1.0000, recall=0.9091, f1=0.9524,support=22
 Label MNR: precision=1.0000, recall=0.2857, f1=0.4444,support=7
 p:0.56 r:0.81 f:0.66
+
+Label O: precision=0.9053, recall=0.6825, f1=0.7783,support=756
+Label A0: precision=0.5455, recall=0.7660, f1=0.6372,support=47
+Label A1: precision=0.7440, recall=0.9497, f1=0.8344,support=358
+Label A2: precision=0.8182, recall=0.5625, f1=0.6667,support=32
+Label ADV: precision=0.0000, recall=0.0000, f1=0.0000,support=0
+Label CND: precision=0.5766, recall=1.0000, f1=0.7315,support=143
+Label PRP: precision=0.7704, recall=0.6460, f1=0.7027,support=161
+Label TMP: precision=1.0000, recall=0.9545, f1=0.9767,support=22
+Label MNR: precision=1.0000, recall=0.2857, f1=0.4444,support=7
+p:0.56 r:0.81 f:0.66
