@@ -68,5 +68,6 @@ def getGoldSRL(eval_pattern_file,SRL_eval_token_file):
     prediction_SRL_list = []
     for pro in result1:
         new_dict = {i2l.get(k,k):v for k,v in pro.items()}
+        new_dict.pop('O',None)
         prediction_SRL_list.append(new_dict)
     return prediction_SRL_list
