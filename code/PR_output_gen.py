@@ -20,7 +20,7 @@ predicate_list = filterPredicate(result,pset)
 print(predicate_list)
 
 #generate the input for SRL
-with open('out\PR\eval_tokens.txt', 'r') as file:
+with open('./out/PR/eval_tokens.txt', 'r') as file:
     sentence_tokens = []
     for line in file:
         line = line.strip()
@@ -33,3 +33,8 @@ for i in range(len(sentence_tokens)):
     for predicate in predicate_list[i]:
         t = ['[SEP]']+[predicate]+['[SEP]']
         SRL_input.append(sentence_tokens[i]+t)
+print(SRL_input)
+with open('./out/PR/SRL_input.txt','w') as f:
+    for i in SRL_input:
+        SRL_input_text= " ".join(i)
+        f.write(SRL_input_text+'\n')

@@ -73,7 +73,7 @@ pr_optimizer = torch.optim.Adam(PR_model.parameters(), lr=LEARNING_RATE)
 pr_total_steps = len(pr_train_dataloader) * 10  # 10 epochs
 pr_scheduler = transformers.get_linear_schedule_with_warmup(pr_optimizer, num_warmup_steps=0, num_training_steps=pr_total_steps)
 
-NUM_EPOCHS = 100
+NUM_EPOCHS = 1
 
 losses = []
 for epoch in range(NUM_EPOCHS):
