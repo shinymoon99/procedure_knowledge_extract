@@ -18,3 +18,18 @@ print(positions)
 pset = extractPredicate('./data/data_correct_formated.json')
 predicate_list = filterPredicate(result,pset)
 print(predicate_list)
+
+#generate the input for SRL
+with open('out\PR\eval_tokens.txt', 'r') as file:
+    sentence_tokens = []
+    for line in file:
+        line = line.strip()
+        t = line.split()
+        sentence_tokens.append(t)
+assert len(sentence_tokens)==len(predicate_list)
+#get SRL input
+SRL_input = []
+for i in range(len(sentence_tokens)):
+    for predicate in predicate_list[i]:
+        t = ['[SEP]']+[predicate]+['[SEP]']
+        SRL_input.append(sentence_tokens[i]+t)

@@ -15,7 +15,7 @@ import torch.distributed as dist
 import torch.utils.data.distributed
 import os
 from util.utils import print_2dlist_to_file,extract_arguments,append_loss_values_to_csv,draw_and_save_loss_curve,read_list_from_csv
-from util.eval import getGoldSRL,calculate_f1_score
+from util.eval import getGoldSRL,calculate_f1_score,getAccuracy
 
 
 class SharedBertModel(torch.nn.Module):
@@ -152,6 +152,8 @@ if __name__ == '__main__':
     gold_arguments_list = gold_arguments_list[int(0.8*len(gold_arguments_list)):]
     arguments_list = getGoldSRL('./out/SRL/eval_result_pattern.txt','./out/SRL/eval_tokens.txt')
     p,r,f = calculate_f1_score(arguments_list,gold_arguments_list)
+    accuracy = getAccuracy(arguments_list,gold_arguments_list)
+    print("accuracy:{:.2f}".format(accuracy))
     print("p:{:.2f} r:{:.2f} f:{:.2f}".format(p,r,f))
 
 

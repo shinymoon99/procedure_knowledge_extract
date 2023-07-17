@@ -26,7 +26,16 @@ def recall(predicted, gold_standard):
     recall = true_positives / (true_positives + false_negatives)
     return recall
 
-
+def getAccuracy(predicted, gold_standard):
+    correct = 0
+    total = 0
+    for pred_sent, gold_sent in zip(predicted, gold_standard):
+        pred_set = set(pred_sent)
+        gold_set = set(gold_sent)        
+        correct += len(pred_set & gold_set)
+        total += len(pred_set)
+    accuracy = correct/total
+    return accuracy
 def calculate_f1_score(predicted, gold_standard):
     prec = precision(predicted, gold_standard)
     rec = recall(predicted, gold_standard)

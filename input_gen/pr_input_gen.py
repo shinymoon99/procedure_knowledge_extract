@@ -51,7 +51,7 @@ def pr_combine_tokens_by_pattern(token,srl,pattern):
     token_temp =split_sentence("".join(token),pattern)
     return token_temp,srl_temp
 def pr_convert2bertformat(tokenizer,dim,token_seq,label_seq,l2i):
-    temp_token_seq = ['CLS']+token_seq
+    temp_token_seq = ['[CLS]']+token_seq
     temp_label_seq = ['O']+label_seq
 
     #convert to id
