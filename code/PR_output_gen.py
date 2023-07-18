@@ -42,7 +42,7 @@ for i in range(len(sentence_tokens)):
         ptext = predicate[0].replace('|','')
         sentenceSRL["predicates"].append({"span":span,"ptext":ptext})
     SRL_input.append(sentenceSRL)
-
+    
 # Open a file for writing
 with open('./out\PR\SRL_input.json', 'w',encoding='utf-8') as file:
     # Write the dictionary to the file in JSON format

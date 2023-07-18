@@ -233,75 +233,51 @@ def SRL_data_load(data,l2i,batch_size,world_size=None,rank=None):
 
     return train_dataloader, eval_dataloader
 # TODO: this data load is useless, keep to see whether useful later, i may delete it later
-def SRL_loadDataFromPR(data,PR_input,l2i,batch_size):
+def SRL_evaldata_loadFromPR(SRL_input,l2i,batch_size):
   
-    pattern = "([-_a-zA-Z()]*\(?([-_a-zA-Z]*)\)?[-_a-zA-Z()]*)"
-    tokenized_sentence = []
-    rel_span = []
-    final_srl = []
+    sentences_tokens = []
+    predicates = []
+    input_tokens = []
+    p_span = []
+    
+    for sentence in SRL_input:
+        sentence_tokens = sentence['words']
+        for p_info in sentence["predicates"]:
+            ptokens = [t for t in p_info["ptext"]]
+            span = p_info["span"] 
+            temp_tokens = sentence_tokens + ["[SEP]"] + ptokens + ["[SEP]"]
+            input_tokens.append(temp_tokens)
+            p_span.append(span)
+           
+            sentences_tokens.append(sentence_tokens)
+            predicates.append(p_info["ptext"])
 
-    for sentence in data:
-        sentence_text = sentence['sentence']
-        for rel in sentence['labels']:
-            tokens, srl = srl_get_sequence_label(sentence_text, rel)
-            combined_tokens, combined_srl = srl_combine_tokens_by_pattern(tokens, srl, pattern)
-            result_srl = [x for x in combined_srl if x != 'X']
-            print("combined_tokens:" + str(combined_tokens))
-
-            print("result_srl:" + str(result_srl))
-            # print(len(tokens))
-            # print(len(srl))
-            assert len(tokens) == len(srl) and len(combined_tokens) == len(result_srl)
-            # add [CLS] and [SEP]+predicate+[SEP]
-            tokens, label, span = add_predicate(combined_tokens, result_srl)
-            print("after add [CLS] and [SEP]+predicate+[SEP]")
-            print(tokens)
-            print(span)
-            print(label)
-            tokenized_sentence.append(tokens)
-            rel_span.append(span)
-            final_srl.append(label)
     # split into train and eval
     # Define hyperparameters
     hidden_size = 768
-
-
-
-    ratio = 0.8
-    leng = len(tokenized_sentence)
-    ratio = 0.8
-    leng = len(tokenized_sentence)
-    # Define the input sentences and their corresponding predicate labels for training
-
-    eval_tokens = tokenized_sentence[int(leng * ratio):]
-    eval_span = rel_span[int(leng * ratio):]
-    eval_srl = final_srl[int(leng * ratio):]
-
     tokenizer = BertTokenizer.from_pretrained('bert-base-chinese')  
     # convert train_data into tensor
 
     # Tokenize the input sentences and their corresponding predicate labels for evaluation
     eval_token_ids = []
     eval_label_ids = []
-    for i, x in enumerate(eval_tokens):
+    for i, x in enumerate(input_tokens):
         input_ids = tokenizer.convert_tokens_to_ids(x)
         eval_token_ids.append(input_ids)
-        eval_label_ids.append([l2i[x] for x in eval_srl[i]])
-
     # todo : do input id has 0,
     # Pad the id_lists of bert to a fixed length
     eval_inputs = [token_ids + [0] * (512 - len(token_ids)) for token_ids in eval_token_ids]
-    eval_labels = [label_ids + [-1] * (512 - len(label_ids)) for label_ids in eval_label_ids]
+
 
     # Convert the tokenized inputs and labels to PyTorch tensors
     eval_inputs = torch.tensor(eval_inputs)
-    eval_labels = torch.tensor(eval_labels)
-    eval_span = torch.tensor(eval_span)
+    eval_span = torch.tensor(p_span)
     # Define the data loaders for training and evaluation
-    eval_dataset = TensorDataset(eval_inputs, eval_span, eval_labels)
+    eval_dataset = TensorDataset(eval_inputs, eval_span)
     eval_sampler = SequentialSampler(eval_dataset)
     eval_dataloader = DataLoader(eval_dataset, sampler=eval_sampler, batch_size=batch_size)
-
+    
+    return eval_dataloader,input_tokens,sentences_tokens,predicates
 def SRL_eval_data_load(data,l2i,batch_size,world_size=None,rank=None):
     pattern = "([-_a-zA-Z()]*\(?([-_a-zA-Z]*)\)?[-_a-zA-Z()]*)"
     tokenized_sentence = []

@@ -4,9 +4,9 @@ import torch
 import torch.nn as nn
 from transformers import BertModel, BertTokenizer, BertForTokenClassification
 from models.model import  Bert_GRU,Bert_SRL
-from input_gen.data_load import POS_data_load,PR_data_load,SRL_data_load,SRL_eval_data_load,pos_label_set
+from input_gen.data_load import POS_data_load,PR_data_load,SRL_data_load,SRL_eval_data_load,pos_label_set,SRL_evaldata_loadFromPR
 from models.model_train import pos_train,pr_train,srl_train
-from models.model_eval import pos_eval,pr_eval,srl_eval
+from models.model_eval import pos_eval,pr_eval,srl_eval,srl_eval_FromPRoutput
 import transformers
 import json
 import time
@@ -124,7 +124,7 @@ if __name__ == '__main__':
         data = json.load(f)
 
 
-    NUM_EPOCHS = 150
+    NUM_EPOCHS = 1
     mp.spawn(main, args=(torch.cuda.device_count(),SRL_model,data,l2i,NUM_EPOCHS), nprocs=torch.cuda.device_count())
     if os.path.isfile('./fine-tuned_model/SRL/BERT_SRL_weight.pth'):
         t1 = torch.load('./fine-tuned_model/SRL/BERT_SRL_weight.pth')
@@ -136,6 +136,7 @@ if __name__ == '__main__':
     """
     eval model
     """
+    result_pattern_loc = "./out/SRL/eval_result_pattern.txt"
     # Evaluate the models on the respective tasks
 
     device = torch.device('cuda')
@@ -147,7 +148,7 @@ if __name__ == '__main__':
     srl_eval_dataloader,eval_tokens = SRL_eval_data_load(data, l2i, 8)
     print_2dlist_to_file(eval_tokens, './out/SRL/eval_tokens.txt')
     #SRL eval
-    srl_eval(SRL_model,srl_eval_dataloader,device,srl_label_set)
+    srl_eval(SRL_model,srl_eval_dataloader,device,srl_label_set,result_pattern_loc)
     # TODO: this ratio should be synchronized with dataload part, which is editable
     gold_arguments_list = gold_arguments_list[int(0.8*len(gold_arguments_list)):]
     arguments_list = getPredictedSRL('./out/SRL/eval_result_pattern.txt','./out/SRL/eval_tokens.txt')
@@ -155,5 +156,30 @@ if __name__ == '__main__':
     accuracy = getAccuracy(arguments_list,gold_arguments_list)
     print("accuracy:{:.2f}".format(accuracy))
     print("p:{:.2f} r:{:.2f} f:{:.2f}".format(p,r,f))
+    """
+    eval model using PR output
+    """
+    # Evaluate the models on the respective tasks
+    result_pattern_loc_PR = "./out/SRL/eval_result_pattern_PRoutput.txt"
+    device = torch.device('cuda')
+    SRL_model.to(device)
+    SRL_model.eval()
+    gold_arguments_list = extract_arguments('./data/data_correct_formated.json')
 
+    with open('./out/PR/SRL_input.json', 'r') as file:
+        PRoutput_data = json.load(file)
+    # Define SRL data
+    srl_eval_dataloader,eval_tokens,sentences_tokens,predicates= SRL_evaldata_loadFromPR(PRoutput_data, l2i, 8)
+    print_2dlist_to_file(eval_tokens, './out/SRL/eval_tokens_PRoutput.txt')
+    #SRL eval
+    srl_eval_FromPRoutput(SRL_model,srl_eval_dataloader,device,srl_label_set,result_pattern_loc_PR)
+
+
+    gold_arguments_list = gold_arguments_list[int(0.8*len(gold_arguments_list)):]
+    arguments_list = getPredictedSRL('./out/SRL/eval_result_pattern_PRoutput.txt','./out/SRL/eval_tokens_PRoutput.txt')
+    # p,r,f = calculate_f1_score(arguments_list,gold_arguments_list)
+    # accuracy = getAccuracy(arguments_list,gold_arguments_list)
+    
+    # print("accuracy:{:.2f}".format(accuracy))
+    # print("p:{:.2f} r:{:.2f} f:{:.2f}".format(p,r,f))
 

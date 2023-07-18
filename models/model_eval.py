@@ -108,7 +108,7 @@ def pr_eval(model,eval_dataloader,device):
         print(f"Label {label[class_tags[i]]}: precision={p[i]}, recall={r[i]}, f1={f1[i]},support={support[i]}")
 
 #SRL eval
-def srl_eval(model,eval_dataloader,device,label_set):
+def srl_eval(model,eval_dataloader,device,label_set,result_pattern_loc):
 
     criterion = nn.CrossEntropyLoss(ignore_index=-1)
     with torch.no_grad():
@@ -162,7 +162,7 @@ def srl_eval(model,eval_dataloader,device,label_set):
         print("avg_loss:%.6f accuracy:%.6f" % (avg_loss, accuracy))
         # edit prediction to omit the space by using mask and print
         t = replace_with_neg1(predictions_list, masks)
-        print_2dlist_to_file(t,"/root/autodl-tmp/procedure_knowledge_extract/out/eval_result_pattern.txt")
+        print_2dlist_to_file(t,result_pattern_loc)
         # Flatten the predictions and true labels
         predictions_flat = [p for pred in predictions_list for p in pred]
         true_labels_flat = [t for label in true_labels for t in label]
@@ -186,7 +186,7 @@ def srl_eval(model,eval_dataloader,device,label_set):
         # print the results
         for i in range(len(p)):
             print(f"Label {label[class_tags[i]]}: precision={p[i]:.4f}, recall={r[i]:.4f}, f1={f1[i]:.4f},support={support[i]}")
-def srl_get_output(srl_input,model,eval_dataloader,device,label_set):
+def srl_eval_FromPRoutput(model,eval_dataloader,device,label_set,result_pattern_loc):
     criterion = nn.CrossEntropyLoss(ignore_index=-1)
     with torch.no_grad():
         total_loss = 0
@@ -234,4 +234,4 @@ def srl_get_output(srl_input,model,eval_dataloader,device,label_set):
             masks.extend(attention_numpy)
         # edit prediction to omit the space by using mask and print
         t = replace_with_neg1(predictions_list, masks)
-        print_2dlist_to_file(t,"/root/autodl-tmp/procedure_knowledge_extract/out/eval_result_pattern.txt")
+        print_2dlist_to_file(t,result_pattern_loc)
