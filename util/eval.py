@@ -42,7 +42,7 @@ def calculate_f1_score(predicted, gold_standard):
     f1 = 2 * ((prec * rec) / (prec + rec))
     return prec,rec,f1
 
-def getGoldSRL(eval_pattern_file,SRL_eval_token_file):
+def getPredictedSRL(eval_pattern_file,SRL_eval_token_file):
     # # Rest of your code goes here
 
     nums = read_2dintlist_from_file(eval_pattern_file)

@@ -8,7 +8,7 @@ from input_gen.data_load import POS_data_load,PR_data_load,SRL_data_load,pos_lab
 from models.model_train import pos_train,pr_train,srl_train
 from models.model_eval import pos_eval,pr_eval,srl_eval
 from util.utils import print_2dlist_to_file,append_loss_values_to_csv,draw_and_save_loss_curve,read_list_from_csv
-from util.eval import recall,precision,calculate_f1_score,getGoldSRL,getAccuracy
+from util.eval import recall,precision,calculate_f1_score,getPredictedSRL,getAccuracy
 from sklearn.metrics import precision_recall_fscore_support
 import transformers
 import json
@@ -87,7 +87,7 @@ append_loss_values_to_csv(losses,"./out/PR/loss_log.csv")
 whole_loss = read_list_from_csv('./out/PR/loss_log.csv')
 draw_and_save_loss_curve(whole_loss,'./out/PR/loss_curve.png')
 """
-eval model
+eval model using gold input
 """
 # Evaluate the models on the respective tasks
 PR_model.eval()

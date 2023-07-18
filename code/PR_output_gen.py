@@ -1,5 +1,6 @@
 import re
 import sys
+import json
 sys.path.append('./')
 from util.utils import getPRPosFromPattern,read_2dintlist_from_file,read_2dstrlist_from_file,convert_negatives,get_token_labels,getPRTokenLabels,extractPredicate,filterPredicate
 pattern = read_2dintlist_from_file('./out/PR/eval_result_pattern.txt')
@@ -19,8 +20,9 @@ pset = extractPredicate('./data/data_correct_formated.json')
 predicate_list = filterPredicate(result,pset)
 print(predicate_list)
 
+json_data = []
 #generate the input for SRL
-with open('./out/PR/eval_tokens.txt', 'r') as file:
+with open('./out/PR/eval_tokens.txt', 'r',encoding='utf-8') as file:
     sentence_tokens = []
     for line in file:
         line = line.strip()
@@ -30,11 +32,27 @@ assert len(sentence_tokens)==len(predicate_list)
 #get SRL input
 SRL_input = []
 for i in range(len(sentence_tokens)):
+
+    sentenceSRL = {} 
+    words = sentence_tokens[i]
+    sentenceSRL["words"]=words
+    sentenceSRL["predicates"]=[]
     for predicate in predicate_list[i]:
-        t = ['[SEP]']+[predicate]+['[SEP]']
-        SRL_input.append(sentence_tokens[i]+t)
-print(SRL_input)
-with open('./out/PR/SRL_input.txt','w') as f:
-    for i in SRL_input:
-        SRL_input_text= " ".join(i)
-        f.write(SRL_input_text+'\n')
+        span = predicate[1]
+        ptext = predicate[0].replace('|','')
+        sentenceSRL["predicates"].append({"span":span,"ptext":ptext})
+    SRL_input.append(sentenceSRL)
+
+# Open a file for writing
+with open('./out\PR\SRL_input.json', 'w',encoding='utf-8') as file:
+    # Write the dictionary to the file in JSON format
+    json.dump(SRL_input, file,ensure_ascii=False)
+
+# SRL_input = []
+
+# for i in range(len(sentence_tokens)):
+#     for predicate in predicate_list[i]:
+#         p = [t.replace('|','') for t in predicate[0]]
+#         t = ['[SEP]']+p+['[SEP]']
+#         SRL_input.append(sentence_tokens[i]+t)
+

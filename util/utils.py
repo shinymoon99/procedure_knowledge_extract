@@ -81,7 +81,7 @@ def getPRTokenLabels(token_pos_list,tokens):
     labels4sentence = []
     for pos in token_pos_list:
         t = tokens[pos[0]:pos[1]+1]
-        labels4sentence.append('|'.join(t))
+        labels4sentence.append(('|'.join(t),pos))
     return labels4sentence
 def getLabels4TokensList(token_pos_dict_list, tokens_list):
     labels_list = []
@@ -108,12 +108,26 @@ def extractPredicate(filename):
             p.add(proposition['REL'])
     return p 
 def filterPredicate(predicate_list,pset):
+    """
+    This function does something with two parameters.
+
+    :param param1: a 2 dim predicte list, where 2 dim hold several predicates in the form of (predicte,pos) (e.g. ("发|送",[4,5]))
+    :type param1: list 
+    :param param2: a set of predicate text
+    :type param2: str
+    :return: The 2 dim filtered predicate list, in the same form of "param 1"
+    :rtype: float
+    """
     filtered_list = []
     for predicates in predicate_list:
         t = []
-        for p in [s.replace('|', '') for s in predicates]:
-            if p in pset:
-                t.append(p)
+        # for p in [s[0].replace('|', '') for s in predicates]:
+        #     if p in pset:
+        #         t.append(s)
+        for p in predicates:
+            ptext = p[0].replace('|','')
+            if ptext in pset:
+                t.append(p)        
         filtered_list.append(t)
     return filtered_list
 def extract_arguments(json_file):

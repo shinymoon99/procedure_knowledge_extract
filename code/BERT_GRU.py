@@ -14,22 +14,14 @@ import time
 import torch.distributed as dist
 import torch.multiprocessing as mp
 from util.utils import extract_arguments
-from util.eval import calculate_f1_score,getGoldSRL
-
+from util.eval import calculate_f1_score,getPredictedSRL
+import os
 """
 load model
 """
 
-bert_model = BertModel.from_pretrained('bert-base-chinese',ignore_mismatched_sizes=True)
-class SharedBertModel(torch.nn.Module):
-    def __init__(self, bert_model):
-        super().__init__()
-        self.bert = bert_model
+#bert_model = BertModel.from_pretrained('bert-base-chinese',ignore_mismatched_sizes=True)
 
-    def forward(self, input_ids, attention_mask):
-        bert_output = self.bert(input_ids=input_ids, attention_mask=attention_mask)[0]
-        return bert_output
-shared_bert_model = SharedBertModel(bert_model)
 
 # Define the SRL model with a BiGRU layer
 hidden_size = 768
@@ -39,14 +31,17 @@ srl_label_set = ("O","A0","A1","A2","A3","A4","ADV","CND","PRP","TMP","MNR")
 num_labels = len(srl_label_set)  # Number of labels: B-PRED, I-PRED, B-CON
 l2i = {label: i for i, label in enumerate(srl_label_set)}
 bert_model = BertModel.from_pretrained('bert-base-chinese',ignore_mismatched_sizes=True)
-SRL_model = Bert_SRL(shared_bert_model.bert, hidden_size, num_labels)
+SRL_model = Bert_SRL(bert_model, hidden_size, num_labels)
 
-
+if os.path.isfile('./fine-tuned_model/SRL/BERT_SRL_weight.pth'):
+    t1 = torch.load('./fine-tuned_model/SRL/BERT_SRL_weight.pth')
+else:
+    pass
 #SRL_model.load_state_dict(torch.load('/root/autodl-tmp/MGTC/fine-tuned_model/srl_model_default/BERT_GRU_weight.pth'))
 #SRL_model.load_state_dict(torch.load('./fine-tuned_model/BERT/SRL/BERT_SRL_weight.pth'))
 
 """
-load data and model
+load data from standard file
 """
 tokenizer = BertTokenizer.from_pretrained("bert-base-chinese")
 #get data
@@ -61,6 +56,10 @@ print(device)
 
 # SRL_model = nn.DataParallel(SRL_model,device_ids = [0,1])
 # SRL_model.to(device)
+"""
+load data from pr output
+"""
+
 """
 train model
 """
@@ -98,7 +97,7 @@ SRL_model.eval()
 srl_eval(SRL_model,srl_eval_dataloader,device,srl_label_set)
 
 gold_arguments_list = extract_arguments('./data/data_correct_formated.json')
-arguments_list = getGoldSRL('out\SRL\eval_result_pattern.txt','out\SRL\eval_tokens.txt')
+arguments_list = getPredictedSRL('out\SRL\eval_result_pattern.txt','out\SRL\eval_tokens.txt')
 p,r,f = calculate_f1_score(arguments_list,gold_arguments_list)
 """
 save model
