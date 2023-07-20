@@ -69,8 +69,8 @@ if  __name__=='__main__':
     for sentence in data:
         sentence_text = sentence['sentence']
 
-        tokens, srl = get_sequence_label(sentence_text,sentence['labels'])
-        combined_tokens, combined_srl = combine_tokens_by_pattern(tokens, srl, pattern)
+        tokens, srl = pr_get_sequence_label(sentence_text,sentence['labels'])
+        combined_tokens, combined_srl = pr_combine_tokens_by_pattern(tokens, srl, pattern)
         result_srl = [x for x in combined_srl if x != 'X']
         #print(combined_tokens)
 

@@ -169,8 +169,9 @@ if __name__ == '__main__':
     with open('./out/PR/SRL_input.json', 'r') as file:
         PRoutput_data = json.load(file)
     # Define SRL data
-    srl_eval_dataloader,eval_tokens,sentences_tokens,predicates= SRL_evaldata_loadFromPR(PRoutput_data, l2i, 8)
+    srl_eval_dataloader,eval_tokens,sentences_tokens,predicates,p_span= SRL_evaldata_loadFromPR(PRoutput_data, l2i, 8)
     print_2dlist_to_file(eval_tokens, './out/SRL/eval_tokens_PRoutput.txt')
+    print_2dlist_to_file(p_span,'./out/SRL/eval_PredicateSpan_PRoutput.txt')
     #SRL eval
     srl_eval_FromPRoutput(SRL_model,srl_eval_dataloader,device,srl_label_set,result_pattern_loc_PR)
 
@@ -183,3 +184,5 @@ if __name__ == '__main__':
     # print("accuracy:{:.2f}".format(accuracy))
     # print("p:{:.2f} r:{:.2f} f:{:.2f}".format(p,r,f))
 
+    #eval
+    
