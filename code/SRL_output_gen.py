@@ -2,6 +2,7 @@ import sys
 sys.path.append('./')
 import os,json
 from util.utils import  read_2dintlist_from_file
+# TODO：wordlist与str的等价互转的完成
 def contains_english_alpha(s):
     for c in s:
         if c.isalpha() and c.isascii():
@@ -89,7 +90,7 @@ eval_data = data[int(ratio*(len(data))):]
 
 sen_tokens = getSentenceTokens(tokens)
 p_tokens =  getPTokens(tokens)
-p_spans = read_2dintlist_from_file("out\SRL\eval_PredicateSpan_PRoutput.txt")
+p_spans = read_2dintlist_from_file("./out/SRL/eval_PredicateSpan_PRoutput.txt")
 # store predicted result into the format of json and compare
 """
     Args:predicate_list ,tokens,p_spans
@@ -112,7 +113,7 @@ for i in range(1,len(tokens)):
         sentence_info["sentence"] = combineTokens2Sen(sen_tokens[i])
         sentence_info["labels"] = []
         sentence_info["labels"].append(reformat_proposition)
-with open('./out\SRL\SRL_output.json', 'w',encoding='utf-8') as file:
+with open('./out/SRL/SRL_output.json', 'w',encoding='utf-8') as file:
     # Write the dictionary to the file in JSON format
     json.dump(sentences_info, file,ensure_ascii=False)
 

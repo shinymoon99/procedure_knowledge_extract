@@ -17,7 +17,7 @@ import os
 from util.utils import print_2dlist_to_file,extract_arguments,append_loss_values_to_csv,draw_and_save_loss_curve,read_list_from_csv
 from util.eval import getPredictedSRL,calculate_f1_score,getAccuracy
 
-
+# TODO:由于没有考虑相同输入的情况，输入必须保证每个句子只能一个，功能等待完善
 class SharedBertModel(torch.nn.Module):
     def __init__(self, bert_model):
         super().__init__()

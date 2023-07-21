@@ -69,6 +69,7 @@ def POS_data_load(data,tokenizer,batch_size):
     return train_dataloader, eval_dataloader
 
 def PR_data_load(data,tokenizer,batch_size,ratio):
+    # TODO: 修改pattern使得str到word_list之间可以等价互相转换
     pattern = "([-_a-zA-Z()]*\(?([-_a-zA-Z]*)\)?[-_a-zA-Z()]*)"
     sentence_seq = []
     label_seq = []
@@ -248,9 +249,17 @@ def SRL_evaldata_loadFromPR(SRL_input,l2i,batch_size):
             temp_tokens = sentence_tokens + ["[SEP]"] + ptokens + ["[SEP]"]
             input_tokens.append(temp_tokens)
             p_span.append(span)
-           
+        
             sentences_tokens.append(sentence_tokens)
             predicates.append(p_info["ptext"])
+        if len(sentence["predicates"]) == 0:
+            span = [0,0]
+            temp_tokens = sentence_tokens + ["[SEP]"] + [""] + ["[SEP]"]
+            input_tokens.append(temp_tokens)
+            p_span.append(span)            
+            sentences_tokens.append(sentence_tokens)
+            predicates.append("")            
+
 
     # split into train and eval
     # Define hyperparameters
