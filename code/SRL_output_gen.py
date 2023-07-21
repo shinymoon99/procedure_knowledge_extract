@@ -113,6 +113,7 @@ for i in range(1,len(tokens)):
         sentence_info["sentence"] = combineTokens2Sen(sen_tokens[i])
         sentence_info["labels"] = []
         sentence_info["labels"].append(reformat_proposition)
+sentences_info.append(sentence_info)
 with open('./out/SRL/SRL_output.json', 'w',encoding='utf-8') as file:
     # Write the dictionary to the file in JSON format
     json.dump(sentences_info, file,ensure_ascii=False)

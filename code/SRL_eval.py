@@ -34,7 +34,7 @@ for i in range(len(eval_data)):
     t = i
     print(t)
     print("outdata: {}\nevaldata:{}".format(out_data[i]["sentence"],eval_data[i]["sentence"]))
-    assert out_data[i]["sentence"]==eval_data[i]["sentence"]
+    assert out_data[i]["sentence"].replace(" ","")==eval_data[i]["sentence"].replace(" ","")
     for prop in out_data[i]["labels"]:
         mp =findMatchedProp(prop,eval_data[i]["labels"])    
         outProp.append(getSRL(prop))

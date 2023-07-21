@@ -48,7 +48,8 @@ with open('./data/data_correct_formated.json', encoding='utf-8') as f:
     data = json.load(f)
 #Define PR data
 ratio = 0.8
-pr_train_dataloader,pr_eval_dataloader,eval_tokens= PR_data_load(data,tokenizer,batch_size=4,ratio=ratio)
+pattern = "([-_a-zA-Z()]*\(?([-_a-zA-Z]*)\)?[-_a-zA-Z()]*)"
+pr_train_dataloader,pr_eval_dataloader,eval_tokens= PR_data_load(data,tokenizer,batch_size=4,ratio=ratio,pattern=pattern)
 eval_labels_list = PR_eval_labels_load(data,ratio)
 print_2dlist_to_file(eval_tokens, './out/PR/eval_tokens.txt')
 
