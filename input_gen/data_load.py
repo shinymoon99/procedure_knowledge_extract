@@ -68,9 +68,9 @@ def POS_data_load(data,tokenizer,batch_size):
 
     return train_dataloader, eval_dataloader
 
-def PR_data_load(data,tokenizer,batch_size,ratio):
+def PR_data_load(data,tokenizer,batch_size,ratio,pattern):
     # TODO: 修改pattern使得str到word_list之间可以等价互相转换
-    pattern = "([-_a-zA-Z()]*\(?([-_a-zA-Z]*)\)?[-_a-zA-Z()]*)"
+
     sentence_seq = []
     label_seq = []
     all_tokens = []
