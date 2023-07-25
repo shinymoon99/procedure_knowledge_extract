@@ -124,7 +124,7 @@ if __name__ == '__main__':
         data = json.load(f)
 
 
-    NUM_EPOCHS = 1
+    NUM_EPOCHS = 100
     mp.spawn(main, args=(torch.cuda.device_count(),SRL_model,data,l2i,NUM_EPOCHS), nprocs=torch.cuda.device_count())
     if os.path.isfile('./fine-tuned_model/SRL/BERT_SRL_weight.pth'):
         t1 = torch.load('./fine-tuned_model/SRL/BERT_SRL_weight.pth')

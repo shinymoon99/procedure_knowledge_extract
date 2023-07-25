@@ -111,8 +111,9 @@ print(positions)
 #using template to filter
 pset = extractPredicate('./data/data_correct_formated.json')
 predicate_list = filterPredicate(result,pset)
-p,r,f = calculate_f1_score(predicate_list,eval_labels_list)
-accuracy = getAccuracy(predicate_list,eval_labels_list)
+p_list = [[p[0].replace('|','') for p in x] for x in predicate_list ]
+p,r,f = calculate_f1_score(p_list,eval_labels_list)
+accuracy = getAccuracy(p_list,eval_labels_list)
 print("p:{:.2f} r:{:.2f} f:{:.2f}".format(p,r,f))
 print("accuracy:{:.2f}".format(accuracy))
 """
