@@ -139,8 +139,7 @@ def PR_eval_labels_load(data,ratio):
     leng = len(sentenceslabels)
     eval_labels = sentenceslabels[int(leng*ratio):]
     return eval_labels 
-def SRL_data_load(data,l2i,batch_size,world_size=None,rank=None):
-    pattern = "([-_a-zA-Z()]*\(?([-_a-zA-Z]*)\)?[-_a-zA-Z()]*)"
+def SRL_data_load(data,l2i,batch_size,pattern,world_size=None,rank=None):
     tokenized_sentence = []
     rel_span = []
     final_srl = []

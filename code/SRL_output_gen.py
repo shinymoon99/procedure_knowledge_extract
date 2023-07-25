@@ -91,6 +91,11 @@ eval_data = data[int(ratio*(len(data))):]
 sen_tokens = getSentenceTokens(tokens)
 p_tokens =  getPTokens(tokens)
 p_spans = read_2dintlist_from_file("./out/SRL/eval_PredicateSpan_PRoutput.txt")
+
+#make span to ignore [cls], to get true span
+for span in p_spans:
+    span[0] = span[0]-1
+    span[1] = span[1]-1
 # store predicted result into the format of json and compare
 """
     Args:predicate_list ,tokens,p_spans
@@ -113,6 +118,7 @@ for i in range(1,len(tokens)):
         sentence_info["sentence"] = combineTokens2Sen(sen_tokens[i])
         sentence_info["labels"] = []
         sentence_info["labels"].append(reformat_proposition)
+sentences_info.append(sentence_info)
 with open('./out/SRL/SRL_output.json', 'w',encoding='utf-8') as file:
     # Write the dictionary to the file in JSON format
     json.dump(sentences_info, file,ensure_ascii=False)

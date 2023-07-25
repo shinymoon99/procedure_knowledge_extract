@@ -44,9 +44,9 @@ def main(rank,world_size,SRL_model,data,l2i,NUM_EPOCHS):
     # Set up distributed training
     dist.init_process_group(backend='nccl', init_method='env://')
     device = torch.device('cuda')
-
+    pattern = "([-_a-zA-Z()]*\(?([-_a-zA-Z]*)\)?[-_a-zA-Z()]*)"
     # Define SRL data
-    srl_train_dataloader, srl_eval_dataloader = SRL_data_load(data, l2i, 8, world_size, rank)
+    srl_train_dataloader, srl_eval_dataloader = SRL_data_load(data, l2i, 8, pattern,world_size, rank)
     """
     train model
     """
