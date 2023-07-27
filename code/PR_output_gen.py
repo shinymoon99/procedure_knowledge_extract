@@ -44,7 +44,7 @@ for i in range(len(sentence_tokens)):
     SRL_input.append(sentenceSRL)
     
 # Open a file for writing
-with open('./out\PR\SRL_input.json', 'w',encoding='utf-8') as file:
+with open('./out/PR/SRL_input.json', 'w',encoding='utf-8') as file:
     # Write the dictionary to the file in JSON format
     json.dump(SRL_input, file,ensure_ascii=False)
 
